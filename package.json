@@ -1,0 +1,35 @@
+{
+  "name": "karna-core",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "dev": "npm run build -w @karna/shared && concurrently -k -n shared,web,api \"npm run dev -w @karna/shared\" \"npm run dev -w @karna/web\" \"npm run dev -w @karna/api\"",
+    "dev:web": "npm run build -w @karna/shared && npm run dev -w @karna/web",
+    "build": "npm run build -w @karna/shared && npm run build -w @karna/api && npm run build -w @karna/web",
+    "lint": "eslint .",
+    "typecheck": "npm run build -w @karna/shared && npm run typecheck --workspaces --if-present",
+    "test": "npm run build -w @karna/shared && npm run test -w @karna/api",
+    "test:e2e": "playwright test",
+    "test:integration": "npm run build -w @karna/shared && npm run test:integration -w @karna/api",
+    "seed": "npm run build -w @karna/shared && npm run seed -w @karna/api",
+    "start": "concurrently -k -n web,api \"npm run start -w @karna/web\" \"npm run start -w @karna/api\""
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "4.13.0",
+    "@playwright/test": "1.63.0",
+    "@types/node": "26.5.1",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "concurrently": "10.0.5",
+    "eslint": "9.39.5",
+    "eslint-config-next": "16.3.5",
+    "typescript": "5.9.3"
+  }
+}

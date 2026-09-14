@@ -1,0 +1,172 @@
+import { portfolioSchema, type Portfolio } from "./schema.js";
+
+/**
+ * Canonical public content, sourced from Karna's CV and accompanying instructions.
+ * Project descriptions are CV claims; the repositories have not been audited.
+ * Replace optional assets here, then run the idempotent database seed command.
+ * The original CV is intentionally not a public asset.
+ */
+export const portfolioSeed: Portfolio = portfolioSchema.parse({
+  profile: {
+    displayName: "Karna Bhosle",
+    fullName: "Karna Krishnkant Bhosle",
+    role: "Aspiring Software Development Engineer",
+    educationLine: "MCA Candidate | SIESCOMS | 2025-2027",
+    institution: "SIES College of Management Studies, Navi Mumbai",
+    location: "Ghatkopar (West), Mumbai",
+    email: "karnabhosle223@gmail.com",
+    emailHref: "mailto:karnabhosle223@gmail.com",
+    phoneDisplay: "+91 9076070482",
+    phoneHref: "tel:+919076070482",
+    introduction: "I'm Karna Bhosle, an aspiring Software Development Engineer pursuing my MCA at SIES College of Management Studies. I build full-stack applications and applied machine-learning systems, connecting interfaces, APIs, databases, and ML services. My projects include AeroSense for air-quality prediction and visualization, and CorpusAI for financial lifecycle planning.",
+    headline: "Building full-stack experiences. Connecting intelligence with engineering.",
+    focusAreas: ["Full-stack development", "Applied machine learning", "API design"],
+    languages: ["English", "Hindi", "Marathi"],
+    languageProficiency: "Proficient in English, Hindi, and Marathi.",
+    publicResume: null,
+  },
+  education: [
+    {
+      id: "mca",
+      degree: "Master of Computer Applications (MCA)",
+      institution: "SIES College of Management Studies, Navi Mumbai",
+      period: "2025-2027",
+      status: "Currently Pursuing",
+    },
+    {
+      id: "bsc-it",
+      degree: "B.Sc. (Information Technology)",
+      institution: "SIES College of Arts, Science and Commerce",
+      period: "2021-2024",
+      status: null,
+    },
+    {
+      id: "hsc",
+      degree: "HSC (State Board)",
+      institution: "P.V.G's Vidya Bhawan High School & Junior College",
+      period: "2019-2021",
+      status: null,
+    },
+    {
+      id: "ssc",
+      degree: "SSC (State Board)",
+      institution: "SIES A.P.J Kalam Memorial High School",
+      period: "2018-2019",
+      status: null,
+    },
+  ],
+  training: [
+    {
+      id: "internshala-ml",
+      title: "Machine Learning Training",
+      provider: "Internshala",
+      duration: "8 weeks",
+      mode: "Online",
+      date: "April 2024",
+      certificate: null,
+    },
+  ],
+  projects: [
+    {
+      id: "aerosense",
+      name: "AeroSense",
+      subtitle: "AI-Powered Air Quality Prediction & Visualization System",
+      repository: "https://github.com/karnbhosle/AeroSense.git",
+      summary: "A full-stack air-quality platform that predicts AQI and visualizes pollution data across five major Indian metro cities.",
+      stack: ["Next.js App Router", "React 19", "Tailwind CSS", "Shadcn UI", "Express", "Flask", "scikit-learn", "MongoDB", "Pandas", "NumPy", "Recharts", "Axios"],
+      highlights: [
+        "Random Forest Regressor trained on historical pollutant data, prepared with Pandas and NumPy.",
+        "AQI prediction scores mapped to CPCB classification bands with a generated health advisory.",
+        "Recharts dashboards for city-wise predictions, historical trends, and pollutant analytics.",
+      ],
+      architecture: {
+        nodes: ["Next.js interface", "Express API", "Flask ML service"],
+        database: "MongoDB",
+        note: "Express forwards pollutant inputs to Flask and persists prediction history and city data in MongoDB.",
+      },
+      details: [
+        "A scikit-learn Random Forest Regressor uses historical pollutant data after data cleaning and feature engineering with Pandas and NumPy.",
+        "The prediction inputs are PM2.5, PM10, NOx, NH3, CO, SO2, and O3. Express forwards them to the Flask ML service, which returns an AQI score mapped to CPCB classification bands with a generated health advisory.",
+        "The Next.js App Router interface uses React 19, Tailwind CSS, and Shadcn UI. An Axios-based Express API layer connects the interface, MongoDB, and the Flask microservice.",
+        "Recharts presents city-wise predictions, historical trends, and pollutant-level analytics. MongoDB stores prediction history and city data.",
+      ],
+      screenshot: null,
+      visual: "air",
+    },
+    {
+      id: "corpusai",
+      name: "CorpusAI",
+      subtitle: "AI-Powered Financial Lifecycle Planning System",
+      repository: "https://github.com/karnbhosle/Financial_investment_planner.git",
+      summary: "A financial lifecycle planning platform combining interactive dashboards, secured APIs, and a modular ML pipeline for personalized financial and retirement planning.",
+      stack: ["React/Vite", "Node.js/Express", "FastAPI", "MongoDB", "Docker", "Docker Compose", "XGBoost", "LSTM", "K-Means", "Isolation Forest", "Zustand", "Recharts", "JWT", "Joi"],
+      highlights: [
+        "Four-service platform with React/Vite, Express, FastAPI, and MongoDB, containerized with Docker Compose.",
+        "Six-stage ML pipeline using XGBoost, a dual-head LSTM, K-Means clustering, and Isolation Forest.",
+        "JWT-secured APIs, Joi validation, and Zustand/Recharts dashboards for financial and retirement planning.",
+      ],
+      architecture: {
+        nodes: ["React/Vite frontend", "Node.js/Express API gateway", "Python FastAPI ML engine"],
+        database: "MongoDB",
+        note: "MongoDB stores generated plans. These four services run together through Docker Compose.",
+      },
+      details: [
+        "The modular six-stage ML pipeline covers risk profiling, growth forecasting, retirement sustainability, inflation impact, recommendations, and anomaly/segmentation detection.",
+        "The pipeline uses XGBoost, a dual-head LSTM, K-Means clustering, and Isolation Forest. The Express API gateway orchestrates inference calls to the Python FastAPI engine and persists generated plans to MongoDB.",
+        "Planning features model systematic withdrawal planning (SWP), long-term capital gains (LTCG) impact, financial-health indexing, and bucket-strategy allocation for personalized retirement planning.",
+        "JWT authentication and Joi schema validation secure the REST APIs. Zustand-driven React dashboards use Recharts across plan generation, financial, retirement, accumulation, and benchmark views.",
+        "The React/Vite frontend, Node.js/Express gateway, FastAPI engine, and MongoDB form a four-service platform containerized with Docker Compose.",
+      ],
+      screenshot: null,
+      visual: "finance",
+    },
+  ],
+  skillGroups: [
+    { category: "Languages", skills: ["Java", "Python", "C++", "C"] },
+    { category: "Frontend", skills: ["React.js", "Next.js", "JavaScript", "HTML", "CSS", "Tailwind CSS"] },
+    { category: "Backend", skills: ["Node.js", "Express.js", "FastAPI", "Flask", "Socket.io"] },
+    { category: "Databases", skills: ["MongoDB", "NoSQL", "RDBMS"] },
+    { category: "Machine Learning", skills: ["Scikit-learn", "XGBoost", "LSTM", "NumPy", "Pandas"] },
+    { category: "Concepts", skills: ["System Design", "API Design & Development"] },
+    { category: "Tools", skills: ["Docker", "Docker Compose", "JWT", "REST APIs", "Git"] },
+  ],
+  activities: {
+    achievements: [
+      {
+        id: "code-icon",
+        title: "KJ Somaiya Code Icon Hackathon",
+        result: "2nd Place",
+        location: null,
+        date: null,
+        designation: null,
+        description: null,
+        certificate: null,
+      },
+      {
+        id: "odoo-finale",
+        title: "Odoo Finale Hackathon",
+        result: null,
+        location: "Gandhinagar",
+        date: null,
+        designation: null,
+        description: null,
+        certificate: null,
+      },
+    ],
+    leadership: [
+      {
+        id: "pixels-techfest",
+        title: "Pixels TechFest 2026",
+        institution: "SIES College of Management Studies (SIESCOMS)",
+        location: "Nerul",
+        role: "MCA Department Student Council Member and Technical Team member",
+        description: "Contributed to the planning and execution of Pixels TechFest 2026 at SIESCOMS, Nerul.",
+        highlights: [
+          "Collaborated with faculty, student committees, and participants.",
+          "Supported technical and non-technical events.",
+          "Assisted with event coordination, participant management, logistics, promotions, and on-site operations.",
+        ],
+      },
+    ],
+  },
+});
