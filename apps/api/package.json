@@ -9,7 +9,7 @@
     "start": "node dist/server.js",
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "lint": "eslint src test",
-    "test": "vitest run test/contact.test.ts test/notifier.test.ts",
+    "test": "vitest run test/contact.test.ts test/notifier.test.ts test/notification-retry.test.ts",
     "test:integration": "vitest run test/models.test.ts",
     "seed": "tsx src/seed.ts"
   },

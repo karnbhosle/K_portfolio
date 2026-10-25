@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+
+<html class="h-full bg-black scroll-smooth" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>KARNA / CORE — Arc Reactor Initiation &amp; Portfolio</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;600;700&amp;family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            oled: '#000000',
+            cyanCore: '#61e8ff',
+            cyanGlow: '#218cff',
+            goldCore: '#c98a45',
+            gunmetal: '#0a1017'
+          },
+          fontFamily: {
+            sans: ['"Space Grotesk"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+            body: ['"Inter"', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    @keyframes slowSpin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    @keyframes reverseSpin {
+      from { transform: rotate(360deg); }
+      to { transform: rotate(0deg); }
+    }
+    @keyframes pulseCore {
+      0%, 100% { opacity: 0.88; filter: drop-shadow(0 0 22px rgba(97,232,255,0.7)); transform: scale(1); }
+      50% { opacity: 1; filter: drop-shadow(0 0 48px rgba(97,232,255,1)); transform: scale(1.03); }
+    }
+    @keyframes ambientBlink {
+      0%, 100% { opacity: 0.85; }
+      48% { opacity: 0.95; }
+      50% { opacity: 0.35; }
+      52% { opacity: 1; }
+      80% { opacity: 0.75; }
+    }
+    .spin-slow { animation: slowSpin 25s linear infinite; }
+    .spin-reverse { animation: reverseSpin 32s linear infinite; }
+    .pulse-core { animation: pulseCore 3s ease-in-out infinite; }
+    .ambient-blink { animation: ambientBlink 4s ease-in-out infinite; }
+
+    /* Shockwave Pulse Rings radiating out during ignition */
+    @keyframes pulseShockwave {
+      0% { transform: scale(0.85); opacity: 0.9; border-width: 3px; }
+      50% { opacity: 0.7; }
+      100% { transform: scale(2.8); opacity: 0; border-width: 1px; }
+    }
+    .pulse-ring-active {
+      animation: pulseShockwave 1.4s cubic-bezier(0.1, 0.8, 0.2, 1) infinite;
+    }
+
+    /* Cinematic Layer-by-Layer Staged Separation Keyframes */
+    /* Layer 1: Outer stator tick ring expands outward and rotates counter-clockwise with mechanical burst */
+    .igniting #layer1OuterStator {
+      animation: expandLayer1 1.7s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+    }
+    @keyframes expandLayer1 {
+      0% { transform: scale(1) rotate(0deg); opacity: 1; filter: drop-shadow(0 0 8px #61e8ff); }
+      35% { transform: scale(1.4) rotate(-90deg); filter: drop-shadow(0 0 28px #61e8ff); }
+      70% { transform: scale(1.85) rotate(-280deg); filter: drop-shadow(0 0 55px #ffffff); opacity: 0.85; }
+      100% { transform: scale(2.55) rotate(-540deg); opacity: 0; filter: drop-shadow(0 0 90px #61e8ff); }
+    }
+
+    /* Layer 2: Toroidal copper & cyan coils uncouple, radially widen with accelerated clockwise spin */
+    .igniting #layer2ToroidalCoils {
+      animation: expandLayer2 1.7s cubic-bezier(0.2, 1, 0.3, 1) forwards !important;
+    }
+    @keyframes expandLayer2 {
+      0% { transform: scale(1) rotate(0deg); opacity: 1; }
+      30% { transform: scale(1.18) rotate(70deg); }
+      65% { transform: scale(1.65) rotate(380deg); filter: drop-shadow(0 0 45px #61e8ff); opacity: 0.95; }
+      100% { transform: scale(2.9) rotate(920deg); opacity: 0; filter: drop-shadow(0 0 110px #ffffff); }
+    }
+
+    /* Layer 3: Inner dashed guideway & sensor node ring unlatches and dilates wider */
+    .igniting #layer3GuidewayNodes {
+      animation: expandLayer3 1.6s cubic-bezier(0.25, 1, 0.35, 1) forwards !important;
+    }
+    @keyframes expandLayer3 {
+      0% { transform: scale(1) rotate(0deg); opacity: 1; }
+      40% { transform: scale(1.35) rotate(-140deg); filter: drop-shadow(0 0 35px #61e8ff); }
+      75% { transform: scale(1.9) rotate(-360deg); opacity: 0.7; }
+      100% { transform: scale(2.7) rotate(-720deg); opacity: 0; }
+    }
+
+    /* Layer 4: Inner concentric housing & lens brackets unlock and scale outward */
+    .igniting #layer4LensBrackets {
+      animation: expandLayer4 1.6s cubic-bezier(0.22, 1, 0.36, 1) forwards !important;
+    }
+    @keyframes expandLayer4 {
+      0% { transform: scale(1); opacity: 1; }
+      45% { transform: scale(1.4) rotate(90deg); filter: drop-shadow(0 0 50px #61e8ff); }
+      80% { transform: scale(2.1) rotate(220deg); opacity: 0.8; }
+      100% { transform: scale(3.1) rotate(480deg); opacity: 0; }
+    }
+
+    /* Layer 5: Central core nucleus overcharges with blinding white plasma overload */
+    .igniting #layer5CoreNucleus {
+      animation: overloadLayer5 1.7s cubic-bezier(0.3, 0, 0.2, 1) forwards !important;
+    }
+    @keyframes overloadLayer5 {
+      0% { transform: scale(1); filter: drop-shadow(0 0 25px #61e8ff); }
+      40% { transform: scale(1.22); filter: drop-shadow(0 0 65px #61e8ff) drop-shadow(0 0 30px #ffffff); }
+      75% { transform: scale(1.75); filter: drop-shadow(0 0 120px #61e8ff) drop-shadow(0 0 80px #ffffff); }
+      100% { transform: scale(2.4); filter: drop-shadow(0 0 200px #ffffff) brightness(2.5); }
+    }
+
+    /* Repulsor Blast discharge expanding toward viewport */
+    .repulsor-blast-active {
+      animation: repulsorBlast 0.65s cubic-bezier(0.8, 0, 0.95, 0.2) forwards !important;
+    }
+    @keyframes repulsorBlast {
+      0% { transform: scale(1); filter: brightness(1.2); }
+      50% { transform: scale(4.5); filter: brightness(2.8) drop-shadow(0 0 90px #61e8ff); }
+      80% { transform: scale(16); filter: brightness(5) drop-shadow(0 0 180px #ffffff); opacity: 0.95; }
+      100% { transform: scale(32); filter: brightness(7) drop-shadow(0 0 280px #ffffff); opacity: 0; }
+    }
+
+    /* Blinding White-Hot Repulsor Flash Overlay */
+    .flash-visible {
+      opacity: 1 !important;
+      pointer-events: auto !important;
+    }
+
+    /* Portfolio Reveal Animation */
+    .portfolio-revealed {
+      opacity: 1 !important;
+      pointer-events: auto !important;
+      transform: scale(1) translateY(0) !important;
+    }
+  </style>
+</head>
+<body class="h-full bg-[#000000] text-white font-sans selection:bg-cyanCore selection:text-black overflow-x-hidden relative">
+<!-- ========================================== -->
+<!-- 1. INITIATION SCREEN (HERO / ARC STAGE)    -->
+<!-- ========================================== -->
+<div class="min-h-screen w-full flex flex-col justify-between items-center relative transition-opacity duration-700" id="splashScreen">
+<!-- Background Scanlines & OLED Grid -->
+<div class="absolute inset-0 pointer-events-none bg-[radial-gradient(#102133_1px,transparent_1px)] [background-size:24px_24px] opacity-25"></div>
+<div class="absolute inset-0 bg-gradient-to-b from-black via-transparent to-black pointer-events-none"></div>
+<!-- Top System Header Status -->
+<header class="w-full z-20 px-6 py-5 flex items-center justify-between border-b border-cyanCore/10">
+<div class="flex items-center space-x-3">
+<div class="w-2.5 h-2.5 rounded-full bg-cyanCore animate-ping" id="statusBeacon"></div>
+<span class="font-mono text-xs tracking-widest text-cyanCore/80 uppercase font-semibold" id="sysStatusText">SYS.STATUS // CORE_STANDBY</span>
+</div>
+<div class="flex items-center gap-4 text-right">
+<div class="hidden sm:flex items-center gap-1.5 font-mono text-[11px] text-gray-500" id="telemetryFlux">
+<span>CORE_FLUX:</span>
+<span class="text-cyanCore font-bold" id="fluxVal">12.4 GW</span>
+</div>
+<span class="font-mono text-[11px] text-gray-400 tracking-wider">INITIATIVE // KARNA / CORE</span>
+</div>
+</header>
+<!-- Central Arc Reactor Stage -->
+<main class="flex-1 flex flex-col items-center justify-center relative w-full max-w-2xl px-4 z-10 py-6">
+<!-- Tap Instructions -->
+<div class="mb-6 text-center transition-all duration-500 cursor-pointer" id="promptText">
+<p class="font-mono text-xs uppercase tracking-[0.3em] text-cyanCore mb-1.5 flex items-center justify-center gap-2 font-semibold">
+<span class="w-1.5 h-1.5 rounded-full bg-cyanCore animate-pulse shadow-[0_0_8px_#61e8ff]"></span>
+        PRESS CORE TO INITIALIZE
+        <span class="w-1.5 h-1.5 rounded-full bg-cyanCore animate-pulse shadow-[0_0_8px_#61e8ff]"></span>
+</p>
+<p class="text-xs text-gray-500 font-mono tracking-wider">KARNA'S ARC REACTOR • PROPRIETARY SYSTEM</p>
+</div>
+<!-- The Interactive Reactor Core Button -->
+<div class="relative transition-transform duration-300" id="reactorWrapper">
+<!-- Expanding Soundwave / Pulse Shockwave Rings (triggered on click) -->
+<div class="absolute -inset-8 rounded-full border-2 border-cyanCore/0 pointer-events-none" id="pulseRing1"></div>
+<div class="absolute -inset-16 rounded-full border-2 border-[#ffffff]/0 pointer-events-none" id="pulseRing2"></div>
+<button aria-label="Engage Arc Reactor and Enter Portfolio" class="relative group cursor-pointer p-3 rounded-full focus:outline-none transition-transform duration-300 active:scale-95 flex items-center justify-center" id="reactorTrigger">
+<!-- Outer Cyan Energy Halo -->
+<div class="absolute inset-0 rounded-full bg-cyanCore/20 blur-3xl group-hover:bg-cyanCore/40 transition-all duration-500" id="haloGlow"></div>
+<!-- Pure White Hot Core Atmospheric Corona -->
+<div class="absolute inset-8 rounded-full bg-[#61e8ff]/25 blur-xl group-hover:bg-[#61e8ff]/40 transition-all duration-500 pointer-events-none"></div>
+<!-- Reactor Container -->
+<div class="w-72 h-72 sm:w-84 sm:h-84 md:w-96 md:h-96 relative flex items-center justify-center rounded-full bg-black border border-cyanCore/40 transition-all duration-500" id="reactorContainer" style="box-shadow: rgba(97, 232, 255, 0.3) 0px 0px 40px, rgba(97, 232, 255, 0.2) 0px 0px 80px, rgba(97, 232, 255, 0.25) 0px 0px 30px inset; border-color: rgba(97, 232, 255, 0.6);">
+<!-- LAYER 1: Rotating Stator Outer Tick Ring & Boundary Ring (Expands Outward Counter-Clockwise on click) -->
+<svg class="absolute inset-2 w-[calc(100%-16px)] h-[calc(100%-16px)] spin-slow pointer-events-none origin-center transition-transform" id="layer1OuterStator" viewbox="0 0 300 300">
+<!-- Outer Accent Guides -->
+<circle cx="150" cy="150" fill="none" r="144" stroke="#ffffff" stroke-dasharray="2 8" stroke-opacity="0.4" stroke-width="0.8"></circle>
+<circle cx="150" cy="150" fill="none" r="140" stroke="#61e8ff" stroke-dasharray="10 20 30 10" stroke-opacity="0.8" stroke-width="1.5"></circle>
+<circle cx="150" cy="150" fill="none" r="136" stroke="#ffffff" stroke-dasharray="40 10 15 10" stroke-opacity="0.7" stroke-width="1"></circle>
+<circle cx="150" cy="150" fill="none" r="130" stroke="#218cff" stroke-dasharray="4 6" stroke-opacity="0.6" stroke-width="1.2"></circle>
+<!-- Crosshairs & Tick Mark Accents -->
+<line stroke="#ffffff" stroke-opacity="0.9" stroke-width="1.5" x1="150" x2="150" y1="4" y2="16"></line>
+<line stroke="#ffffff" stroke-opacity="0.9" stroke-width="1.5" x1="150" x2="150" y1="284" y2="296"></line>
+<line stroke="#ffffff" stroke-opacity="0.9" stroke-width="1.5" x1="4" x2="16" y1="150" y2="150"></line>
+<line stroke="#ffffff" stroke-opacity="0.9" stroke-width="1.5" x1="284" x2="296" y1="150" y2="150"></line>
+<!-- Nodes with Cyan Halos & Glowing Points -->
+<circle class="ambient-blink" cx="150" cy="12" fill="#61e8ff" fill-opacity="0.5" r="6"></circle>
+<circle class="ambient-blink" cx="150" cy="12" fill="#ffffff" r="3"></circle>
+<circle class="ambient-blink" cx="270" cy="80" fill="#61e8ff" fill-opacity="0.5" r="6"></circle>
+<circle class="ambient-blink" cx="270" cy="80" fill="#ffffff" r="3"></circle>
+<circle class="ambient-blink" cx="270" cy="220" fill="#61e8ff" fill-opacity="0.5" r="6"></circle>
+<circle class="ambient-blink" cx="270" cy="220" fill="#ffffff" r="3"></circle>
+<circle class="ambient-blink" cx="150" cy="288" fill="#61e8ff" fill-opacity="0.5" r="6"></circle>
+<circle class="ambient-blink" cx="150" cy="288" fill="#ffffff" r="3"></circle>
+<circle class="ambient-blink" cx="30" cy="220" fill="#c98a45" fill-opacity="0.5" r="6"></circle>
+<circle class="ambient-blink" cx="30" cy="220" fill="#ffffff" r="3"></circle>
+<circle class="ambient-blink" cx="30" cy="80" fill="#61e8ff" fill-opacity="0.5" r="6"></circle>
+<circle class="ambient-blink" cx="30" cy="80" fill="#ffffff" r="3"></circle>
+</svg>
+<!-- LAYER 2: Toroidal Copper & Cyan Coils (Uncouples & Expands Radially with Accelerated Spin) -->
+<svg class="absolute inset-5 w-[calc(100%-40px)] h-[calc(100%-40px)] spin-reverse pointer-events-none origin-center transition-transform" id="layer2ToroidalCoils" viewbox="0 0 260 260">
+<circle cx="130" cy="130" fill="none" r="118" stroke="#162738" stroke-width="12"></circle>
+<circle cx="130" cy="130" fill="none" r="118" stroke="#61e8ff" stroke-dasharray="6 14" stroke-opacity="0.9" stroke-width="1.5"></circle>
+<circle cx="130" cy="130" fill="none" r="112" stroke="#61e8ff" stroke-dasharray="16 8" stroke-opacity="0.7" stroke-width="2"></circle>
+<!-- 10 Toroidal Coils with Copper / Cyan & White Core Bindings -->
+<g fill="#07121b" id="miniCoils" stroke="#61e8ff" stroke-width="1">
+<rect height="18" rx="2" stroke="#c98a45" stroke-width="1.5" width="12" x="124" y="16"></rect>
+<line stroke="#ffffff" stroke-width="2" x1="124" x2="136" y1="25" y2="25"></line>
+<g transform="rotate(36 130 130)"><rect height="18" rx="2" stroke="#61e8ff" stroke-width="1.5" width="12" x="124" y="16"></rect><line stroke="#ffffff" stroke-width="2" x1="124" x2="136" y1="25" y2="25"></line></g>
+<g transform="rotate(72 130 130)"><rect height="18" rx="2" stroke="#61e8ff" stroke-width="1.5" width="12" x="124" y="16"></rect><line stroke="#ffffff" stroke-width="2" x1="124" x2="136" y1="25" y2="25"></line></g>
+<g transform="rotate(108 130 130)"><rect height="18" rx="2" stroke="#c98a45" stroke-width="1.5" width="12" x="124" y="16"></rect><line stroke="#ffffff" stroke-width="2" x1="124" x2="136" y1="25" y2="25"></line></g>
+<g transform="rotate(144 130 130)"><rect height="18" rx="2" stroke="#61e8ff" stroke-width="1.5" width="12" x="124" y="16"></rect><line stroke="#ffffff" stroke-width="2" x1="124" x2="136" y1="25" y2="25"></line></g>
+<g transform="rotate(180 130 130)"><rect height="18" rx="2" stroke="#c98a45" stroke-width="1.5" width="12" x="124" y="16"></rect><line stroke="#ffffff" stroke-width="2" x1="124" x2="136" y1="25" y2="25"></line></g>
+<g transform="rotate(216 130 130)"><rect height="18" rx="2" stroke="#61e8ff" stroke-width="1.5" width="12" x="124" y="16"></rect><line stroke="#ffffff" stroke-width="2" x1="124" x2="136" y1="25" y2="25"></line></g>
+<g transform="rotate(252 130 130)"><rect height="18" rx="2" stroke="#c98a45" stroke-width="1.5" width="12" x="124" y="16"></rect><line stroke="#ffffff" stroke-width="2" x1="124" x2="136" y1="25" y2="25"></line></g>
+<g transform="rotate(288 130 130)"><rect height="18" rx="2" stroke="#61e8ff" stroke-width="1.5" width="12" x="124" y="16"></rect><line stroke="#ffffff" stroke-width="2" x1="124" x2="136" y1="25" y2="25"></line></g>
+<g transform="rotate(324 130 130)"><rect height="18" rx="2" stroke="#61e8ff" stroke-width="1.5" width="12" x="124" y="16"></rect><line stroke="#ffffff" stroke-width="2" x1="124" x2="136" y1="25" y2="25"></line></g>
+</g>
+</svg>
+<!-- LAYER 3: Inner Dashed Guideway & Sensor Node Ring (Unlatches & Dilates Wider) -->
+<svg class="absolute inset-8 w-[calc(100%-64px)] h-[calc(100%-64px)] pointer-events-none origin-center transition-transform" id="layer3GuidewayNodes" viewbox="0 0 200 200">
+<circle cx="100" cy="100" fill="none" r="92" stroke="#61e8ff" stroke-dasharray="4 8" stroke-opacity="0.8" stroke-width="1.2"></circle>
+<circle cx="100" cy="100" fill="none" r="84" stroke="#ffffff" stroke-dasharray="1 5" stroke-opacity="0.5" stroke-width="1"></circle>
+<circle cx="100" cy="12" fill="#61e8ff" r="2.5"></circle>
+<circle cx="188" cy="100" fill="#61e8ff" r="2.5"></circle>
+<circle cx="100" cy="188" fill="#61e8ff" r="2.5"></circle>
+<circle cx="12" cy="100" fill="#61e8ff" r="2.5"></circle>
+</svg>
+<!-- LAYER 4: Inner Concentric Housing & Lens Brackets (Unlocks & Scales Outward) -->
+<div class="absolute inset-12 rounded-full border border-cyanCore/60 pointer-events-none origin-center transition-transform" id="layer4LensBrackets" style="box-shadow: 0 0 15px rgba(97,232,255,0.4) inset;">
+<div class="absolute inset-2 rounded-full border border-[#218cff]/50 border-dotted"></div>
+</div>
+<!-- LAYER 5: Central Core Nucleus (White-Hot Plasma Overload, Houses White Typography) -->
+<div class="w-36 h-36 sm:w-40 sm:h-40 rounded-full bg-[#030910] border-2 border-[#61e8ff] flex flex-col items-center justify-center relative pulse-core z-10 overflow-hidden origin-center transition-all duration-300" id="layer5CoreNucleus" style="box-shadow: rgba(97, 232, 255, 0.8) 0px 0px 30px, rgba(33, 140, 255, 0.6) 0px 0px 60px, rgba(97, 232, 255, 0.5) 0px 0px 25px inset, rgba(97, 232, 255, 0.8) 0px 0px 45px inset;">
+<!-- Concentric Electric Cyan Inner Boundary Ring -->
+<div class="absolute inset-1.5 rounded-full border border-cyanCore/70 pointer-events-none"></div>
+<div class="absolute inset-3 rounded-full border border-cyanCore/40 border-dashed pointer-events-none"></div>
+<!-- Electric Cyan Central Core Glow Disc -->
+<div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+<div class="w-24 h-24 rounded-full bg-[radial-gradient(circle,#61e8ff_0%,rgba(97,232,255,0.65)_35%,rgba(33,140,255,0.25)_65%,transparent_80%)] opacity-80 blur-[2px]"></div>
+</div>
+<!-- Arc Reactor Glass Reflection Highlight -->
+<div class="absolute top-1 left-2 w-16 h-8 bg-white/20 rounded-full blur-[1px] transform -rotate-45 pointer-events-none"></div>
+<!-- Brilliant White Typography: ENGAGE -->
+<span class="font-mono text-[10px] text-white font-bold tracking-[0.25em] uppercase mb-0.5 relative z-10" style="text-shadow: rgb(255, 255, 255) 0px 0px 8px, rgba(255, 255, 255, 0.8) 0px 0px 16px;">ENGAGE</span>
+<!-- Brilliant White Typography: Karna Bhosle -->
+<span class="font-sans font-bold text-lg text-white tracking-wider text-center relative z-10 leading-snug" id="userName" style="color: rgb(255, 255, 255); text-shadow: rgb(255, 255, 255) 0px 0px 12px, rgba(255, 255, 255, 0.9) 0px 0px 24px, rgba(255, 255, 255, 0.6) 0px 0px 35px;">
+              Karna<br/>Bhosle
+            </span>
+<!-- Brilliant White Typography: MCA // SDE -->
+<div class="mt-1 flex items-center space-x-1.5 relative z-10">
+<span class="w-1.5 h-1.5 rounded-full bg-white shadow-[0_0_8px_#ffffff]"></span>
+<span class="font-mono text-[9px] text-white font-semibold tracking-widest uppercase" style="text-shadow: 0 0 8px rgba(255,255,255,0.9);">MCA // SDE</span>
+<span class="w-1.5 h-1.5 rounded-full bg-white shadow-[0_0_8px_#ffffff]"></span>
+</div>
+</div>
+</div>
+</button>
+</div>
+<!-- Interactive Status Output -->
+<div class="mt-6 text-center font-mono text-xs w-full max-w-sm">
+<div class="text-cyanCore font-medium tracking-wider flex items-center justify-center gap-2" id="reactorStatus">
+<span class="w-2 h-2 rounded-full bg-cyanCore animate-ping"></span>
+        SYSTEM READY • CLICK ARC REACTOR TO ENGAGE
+      </div>
+<!-- Live Energy Surge Bar: initial 1%, spikes live from 1% to 100% on click -->
+<div class="w-full bg-gray-950 border border-cyanCore/20 rounded h-2 mt-3 p-[1px] relative overflow-hidden">
+<div class="h-full bg-cyanCore rounded-sm transition-all duration-100 w-[1%] shadow-[0_0_10px_#61e8ff]" id="energyBar"></div>
+</div>
+<p class="text-gray-500 text-[11px] mt-2">SIESCOMS • 2025-2027 • Full-Stack &amp; ML</p>
+</div>
+</main>
+<!-- Bottom Terminal Diagnostics -->
+<footer class="w-full z-20 px-6 py-5 border-t border-cyanCore/10 flex flex-col sm:flex-row items-center justify-between gap-2 text-[11px] font-mono text-gray-500">
+<div class="flex items-center space-x-4">
+<span id="latencyStat">LATENCY: 0.04ms</span>
+<span id="matrixStat">ENERGY MATRIX: <span class="text-cyanCore font-bold" id="matrixVal">1%</span></span>
+<span class="text-cyanCore/80">OLED OPTIMIZED</span>
+</div>
+<div>
+<span>PORTFOLIO_ID: ironcodedK</span>
+</div>
+</footer>
+</div>
+<!-- ========================================== -->
+<!-- 2. IRON MAN REPULSOR BLAST FLASH OVERLAY   -->
+<!-- ========================================== -->
+<div class="fixed inset-0 opacity-0 pointer-events-none z-50 transition-opacity duration-300 flex items-center justify-center" id="repulsorFlashOverlay">
+<!-- Repulsor Concentric Energy Burst -->
+<div class="absolute inset-0 bg-white" id="repulsorWhiteFlare"></div>
+<div class="absolute w-96 h-96 rounded-full bg-cyanCore blur-3xl opacity-80 scale-150 animate-pulse" id="repulsorCyanCorona" style="box-shadow: 0 0 120px #ffffff, 0 0 240px #61e8ff;"></div>
+<div class="relative z-10 text-center font-mono text-black font-bold uppercase px-6 opacity-0 transition-opacity duration-300" id="repulsorCard">
+<div class="w-16 h-16 border-4 border-black border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+<p class="text-2xl font-black tracking-[0.25em]">REPULSOR DISCHARGE • 100%</p>
+<p class="text-xs text-gray-900 mt-1 font-mono tracking-widest">INITIALIZATION OVERDRIVE VERIFIED // ENGAGING WORKSPACE</p>
+</div>
+</div>
+<!-- ========================================== -->
+<!-- 3. COMPLETE DESKTOP PORTFOLIO WORKSPACE    -->
+<!-- ========================================== -->
+<div class="fixed inset-0 bg-[#000000] text-white opacity-0 pointer-events-none transition-all duration-700 z-40 overflow-y-auto flex flex-col" id="portfolioScreen">
+<!-- Subtle Centered Ambient Arc Reactor Watermark in Background -->
+<div class="fixed inset-0 flex items-center justify-center pointer-events-none opacity-5 z-0">
+<div class="w-[700px] h-[700px] rounded-full border border-cyanCore/60 spin-slow flex items-center justify-center">
+<div class="w-[500px] h-[500px] rounded-full border border-cyanCore/40 spin-reverse flex items-center justify-center">
+<div class="w-[300px] h-[300px] rounded-full border border-dashed border-cyanCore/50"></div>
+</div>
+</div>
+</div>
+<!-- Top Global Navigation Bar & System Re-Engage Header -->
+<header class="sticky top-0 z-30 bg-black/85 backdrop-blur-md border-b border-cyanCore/15 px-6 py-3.5 flex items-center justify-between">
+<div class="flex items-center space-x-3">
+<div class="w-3 h-3 rounded-full bg-cyanCore shadow-[0_0_10px_#61e8ff]"></div>
+<span class="font-mono text-xs tracking-widest text-cyanCore uppercase font-bold">KARNA BHOSLE // SYSTEM ONLINE</span>
+<span class="hidden md:inline-block px-2 py-0.5 rounded text-[10px] font-mono bg-cyanCore/10 text-cyanCore border border-cyanCore/30">MCA SDE '27</span>
+</div>
+<!-- Quick Jump Nav Anchors -->
+<nav class="hidden lg:flex items-center space-x-6 font-mono text-xs text-gray-400">
+<a class="hover:text-cyanCore transition" href="#section-about">01.ABOUT</a>
+<a class="hover:text-cyanCore transition" href="#section-qualifications">02.ACADEMICS</a>
+<a class="hover:text-cyanCore transition" href="#section-projects">03.PROJECTS</a>
+<a class="hover:text-cyanCore transition" href="#section-matrix">04.TECH_MATRIX</a>
+<a class="hover:text-cyanCore transition" href="#section-leadership">05.LEADERSHIP</a>
+<a class="hover:text-cyanCore transition" href="#section-contact">06.CONTACT</a>
+</nav>
+<!-- Top Telemetry & Re-engage Action -->
+<div class="flex items-center gap-3">
+<span class="hidden sm:inline font-mono text-[11px] text-gray-500">ID: ironcodedK</span>
+<button class="font-mono text-[11px] uppercase tracking-wider bg-cyanCore/10 hover:bg-cyanCore hover:text-black text-cyanCore border border-cyanCore/40 px-3 py-1.5 rounded transition flex items-center gap-1.5 font-semibold" id="reengageBtn">
+<span class="material-symbols-outlined text-[14px]">refresh</span>
+        SYSTEM RE-ENGAGE // REPLAY IGNITION
+      </button>
+</div>
+</header>
+<!-- Main Content Layout (Left Nav Rail + Main Portfolio Sections) -->
+<div class="relative z-10 flex-1 flex max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 gap-8">
+<!-- Desktop Left Navigation Rail -->
+<aside class="hidden xl:flex flex-col w-64 shrink-0 sticky top-20 self-start space-y-6">
+<div class="p-4 rounded-lg bg-gunmetal/80 border border-cyanCore/20 backdrop-blur">
+<div class="flex items-center gap-3 mb-3">
+<div class="w-10 h-10 rounded-full bg-cyanCore/10 border border-cyanCore/50 flex items-center justify-center font-bold text-cyanCore">
+            KB
+          </div>
+<div>
+<h3 class="text-sm font-bold text-white">Karna Bhosle</h3>
+<p class="text-[11px] font-mono text-cyanCore">MCA Student &amp; SDE</p>
+</div>
+</div>
+<div class="space-y-1 font-mono text-[11px] text-gray-400 pt-2 border-t border-cyanCore/10">
+<div class="flex justify-between"><span>INST:</span><span class="text-white">SIESCOMS</span></div>
+<div class="flex justify-between"><span>BATCH:</span><span class="text-white">2025 – 2027</span></div>
+<div class="flex justify-between"><span>MATRIX:</span><span class="text-cyanCore">100% ONLINE</span></div>
+</div>
+</div>
+<!-- Left Nav Section Links -->
+<nav class="space-y-1.5 font-mono text-xs">
+<a class="flex items-center gap-2.5 px-3 py-2 rounded bg-cyanCore/10 text-cyanCore border-l-2 border-cyanCore" href="#section-about">
+<span class="text-gray-500">01</span> Know Karna
+        </a>
+<a class="flex items-center gap-2.5 px-3 py-2 rounded text-gray-400 hover:text-white hover:bg-white/5 transition" href="#section-qualifications">
+<span class="text-gray-500">02</span> Academic &amp; Pro
+        </a>
+<a class="flex items-center gap-2.5 px-3 py-2 rounded text-gray-400 hover:text-white hover:bg-white/5 transition" href="#section-projects">
+<span class="text-gray-500">03</span> Featured Projects
+        </a>
+<a class="flex items-center gap-2.5 px-3 py-2 rounded text-gray-400 hover:text-white hover:bg-white/5 transition" href="#section-matrix">
+<span class="text-gray-500">04</span> Tech Matrix
+        </a>
+<a class="flex items-center gap-2.5 px-3 py-2 rounded text-gray-400 hover:text-white hover:bg-white/5 transition" href="#section-leadership">
+<span class="text-gray-500">05</span> Leadership
+        </a>
+<a class="flex items-center gap-2.5 px-3 py-2 rounded text-gray-400 hover:text-white hover:bg-white/5 transition" href="#section-contact">
+<span class="text-gray-500">06</span> Contact Console
+        </a>
+</nav>
+<div class="p-3 rounded border border-cyanCore/10 bg-black/60 font-mono text-[10px] text-gray-500">
+<p>TERMINAL // ironcodedK</p>
+<p class="text-cyanCore/80 mt-1">STATUS: OPERATIONAL</p>
+</div>
+</aside>
+<!-- Main Dynamic Feed Content -->
+<main class="flex-1 space-y-16 pb-16 min-w-0">
+<!-- SECTION 01: Know Karna (with 1:1 photo slot) -->
+<section class="space-y-6 pt-2" id="section-about">
+<div class="flex items-center justify-between border-b border-cyanCore/20 pb-3">
+<h2 class="font-mono text-sm tracking-widest text-cyanCore flex items-center gap-2 uppercase">
+<span class="w-2 h-2 rounded-full bg-cyanCore"></span> 01 // Know Karna
+          </h2>
+<span class="font-mono text-xs text-gray-500">OVERVIEW &amp; PROFILE</span>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-center p-6 rounded-xl bg-gunmetal/60 border border-cyanCore/20 shadow-[0_0_30px_rgba(10,16,23,0.8)]">
+<!-- 1:1 Photo Slot with Tech Brackets -->
+<div class="flex flex-col items-center justify-center">
+<div class="w-48 h-48 sm:w-52 sm:h-52 aspect-square rounded-xl relative p-1 bg-gradient-to-tr from-cyanCore/40 via-transparent to-cyanCore/20 border border-cyanCore/40 group overflow-hidden">
+<div class="w-full h-full rounded-lg bg-black/90 flex flex-col items-center justify-center relative overflow-hidden border border-cyanCore/20">
+<div class="absolute inset-0 bg-[radial-gradient(#61e8ff_1px,transparent_1px)] [background-size:12px_12px] opacity-20"></div>
+<!-- Stylized Avatar Graphic / Photo Slot -->
+<div class="w-24 h-24 rounded-full bg-cyanCore/10 border-2 border-cyanCore/60 flex items-center justify-center mb-2 shadow-[0_0_20px_rgba(97,232,255,0.4)]">
+<span class="material-symbols-outlined text-4xl text-cyanCore">person</span>
+</div>
+<span class="font-mono text-xs font-bold text-white tracking-wider">KARNA BHOSLE</span>
+<span class="font-mono text-[10px] text-cyanCore tracking-widest mt-0.5">[1:1 PROFILE SLOT]</span>
+</div>
+<div class="absolute top-1 left-1 w-3 h-3 border-t-2 border-l-2 border-cyanCore"></div>
+<div class="absolute bottom-1 right-1 w-3 h-3 border-b-2 border-r-2 border-cyanCore"></div>
+</div>
+</div>
+<!-- Bio & Core Pitch -->
+<div class="md:col-span-2 space-y-4">
+<div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyanCore/10 text-cyanCore border border-cyanCore/30 text-xs font-mono">
+<span class="w-1.5 h-1.5 rounded-full bg-cyanCore animate-ping"></span>
+              FULL-STACK DEVELOPER &amp; ML SYSTEMS ARCHITECT
+            </div>
+<h1 class="text-2xl sm:text-3xl font-bold font-sans tracking-tight text-white">
+              Engineering High-Throughput Web Applications &amp; Applied Intelligence
+            </h1>
+<p class="font-body text-gray-300 text-sm sm:text-base leading-relaxed">
+              Currently pursuing Master of Computer Applications (MCA) at <strong class="text-white font-medium">SIESCOMS</strong> (2025–2027). Dedicated to building scalable software architectures, distributed data pipelines, and machine learning models that turn complex data matrices into actionable insights.
+            </p>
+<div class="grid grid-cols-2 sm:grid-cols-3 gap-3 pt-2 font-mono text-xs">
+<div class="p-2.5 rounded bg-black/50 border border-cyanCore/15">
+<span class="text-gray-500 block text-[10px]">PRIMARY FOCUS</span>
+<span class="text-cyanCore font-semibold">Full-Stack &amp; AI</span>
+</div>
+<div class="p-2.5 rounded bg-black/50 border border-cyanCore/15">
+<span class="text-gray-500 block text-[10px]">DEGREE</span>
+<span class="text-white font-semibold">MCA (SIESCOMS)</span>
+</div>
+<div class="p-2.5 rounded bg-black/50 border border-cyanCore/15">
+<span class="text-gray-500 block text-[10px]">PORTFOLIO CODEX</span>
+<span class="text-white font-semibold">ironcodedK</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- SECTION 02: Academic & Professional Qualifications -->
+<section class="space-y-6" id="section-qualifications">
+<div class="flex items-center justify-between border-b border-cyanCore/20 pb-3">
+<h2 class="font-mono text-sm tracking-widest text-cyanCore flex items-center gap-2 uppercase">
+<span class="w-2 h-2 rounded-full bg-cyanCore"></span> 02 // Academic &amp; Professional Qualifications
+          </h2>
+<span class="font-mono text-xs text-gray-500">TRAJECTORY</span>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<!-- Academic Card -->
+<div class="p-5 rounded-lg bg-gunmetal/50 border border-cyanCore/20 hover:border-cyanCore/50 transition">
+<div class="flex items-start justify-between">
+<div class="space-y-1">
+<span class="font-mono text-[10px] text-cyanCore uppercase tracking-widest px-2 py-0.5 rounded bg-cyanCore/10">ACADEMICS</span>
+<h3 class="text-base font-bold text-white mt-2">Master of Computer Applications (MCA)</h3>
+<p class="text-xs text-gray-400">SIES College of Management Studies (SIESCOMS)</p>
+</div>
+<span class="font-mono text-xs text-cyanCore font-bold">2025 – 2027</span>
+</div>
+<p class="font-body text-xs text-gray-300 mt-3 leading-relaxed">
+              Specializing in Advanced Software Engineering, Cloud Infrastructure, Machine Learning Systems, Database Architecture, and Distributed Computing.
+            </p>
+</div>
+<!-- Professional Qualification Card -->
+<div class="p-5 rounded-lg bg-gunmetal/50 border border-cyanCore/20 hover:border-cyanCore/50 transition">
+<div class="flex items-start justify-between">
+<div class="space-y-1">
+<span class="font-mono text-[10px] text-emerald-400 uppercase tracking-widest px-2 py-0.5 rounded bg-emerald-500/10">INDUSTRY READINESS</span>
+<h3 class="text-base font-bold text-white mt-2">Software Development Engineering (SDE)</h3>
+<p class="text-xs text-gray-400">Core Systems &amp; Web Platform Engineering</p>
+</div>
+<span class="font-mono text-xs text-emerald-400 font-bold">ACTIVE</span>
+</div>
+<p class="font-body text-xs text-gray-300 mt-3 leading-relaxed">
+              Proven proficiency in modern JavaScript/TypeScript frameworks, Python systems, REST APIs, Microservices, and ML-assisted web pipelines.
+            </p>
+</div>
+</div>
+</section>
+<!-- SECTION 03: Featured Engineering Projects (CorpusAI First, AeroSense Second) -->
+<section class="space-y-6" id="section-projects">
+<div class="flex items-center justify-between border-b border-cyanCore/20 pb-3">
+<h2 class="font-mono text-sm tracking-widest text-cyanCore flex items-center gap-2 uppercase">
+<span class="w-2 h-2 rounded-full bg-cyanCore"></span> 03 // Featured Engineering Projects
+          </h2>
+<span class="font-mono text-xs text-gray-500">ENGINEERING SUITE</span>
+</div>
+<div class="space-y-6">
+<!-- 1. CorpusAI (Must be FIRST) -->
+<div class="p-6 rounded-xl bg-gunmetal/70 border-2 border-cyanCore/40 relative overflow-hidden group shadow-[0_0_25px_rgba(97,232,255,0.15)]">
+<div class="absolute -right-10 -bottom-10 w-48 h-48 rounded-full bg-cyanCore/5 blur-2xl pointer-events-none"></div>
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
+<div class="flex items-center gap-2">
+<span class="font-mono text-xs font-bold text-cyanCore px-2 py-0.5 rounded bg-cyanCore/10 border border-cyanCore/30">PROJECT 01 // FLAGSHIP</span>
+<h3 class="text-xl font-bold font-sans text-white">CorpusAI — Multi-Modal Semantic Knowledge Engine</h3>
+</div>
+<span class="font-mono text-xs text-cyanCore font-semibold flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-cyanCore animate-pulse"></span> PRODUCTION READY
+              </span>
+</div>
+<p class="font-body text-sm text-gray-300 leading-relaxed max-w-3xl">
+              An intelligent document synthesis &amp; semantic retrieval system engineered to process, vectorize, and query enterprise knowledge repositories in real-time. Features hybrid keyword-vector indexing, low-latency LLM agent chaining, and secure localized inference.
+            </p>
+<div class="flex flex-wrap gap-2 mt-4 font-mono text-xs">
+<span class="px-2.5 py-1 rounded bg-black/60 border border-cyanCore/20 text-cyanCore">Python</span>
+<span class="px-2.5 py-1 rounded bg-black/60 border border-cyanCore/20 text-cyanCore">FastAPI</span>
+<span class="px-2.5 py-1 rounded bg-black/60 border border-cyanCore/20 text-cyanCore">Vector DB (Pinecone/Milvus)</span>
+<span class="px-2.5 py-1 rounded bg-black/60 border border-cyanCore/20 text-cyanCore">LangChain</span>
+<span class="px-2.5 py-1 rounded bg-black/60 border border-cyanCore/20 text-cyanCore">React / Tailwind</span>
+</div>
+<div class="mt-4 pt-4 border-t border-cyanCore/10 flex items-center gap-4 font-mono text-xs">
+<span class="text-gray-400">LATENCY: &lt;140ms</span>
+<span class="text-gray-400">RETRIEVAL ACCURACY: 98.4%</span>
+</div>
+</div>
+<!-- 2. AeroSense (Must be SECOND) -->
+<div class="p-6 rounded-xl bg-gunmetal/70 border border-cyanCore/30 relative overflow-hidden group hover:border-cyanCore/60 transition">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
+<div class="flex items-center gap-2">
+<span class="font-mono text-xs font-bold text-gray-400 px-2 py-0.5 rounded bg-white/5 border border-white/10">PROJECT 02</span>
+<h3 class="text-xl font-bold font-sans text-white">AeroSense — Environmental Telemetry &amp; Predictive Analytics</h3>
+</div>
+<span class="font-mono text-xs text-gray-400">IOT &amp; TIME-SERIES ML</span>
+</div>
+<p class="font-body text-sm text-gray-300 leading-relaxed max-w-3xl">
+              Real-time atmospheric condition monitor and forecasting platform connecting distributed IoT sensor nodes. Employs LSTM recurrent models for ambient particulate anomaly detection and provides interactive geospatial visualisations.
+            </p>
+<div class="flex flex-wrap gap-2 mt-4 font-mono text-xs">
+<span class="px-2.5 py-1 rounded bg-black/60 border border-cyanCore/20 text-gray-300">TypeScript</span>
+<span class="px-2.5 py-1 rounded bg-black/60 border border-cyanCore/20 text-gray-300">Node.js / Express</span>
+<span class="px-2.5 py-1 rounded bg-black/60 border border-cyanCore/20 text-gray-300">TensorFlow.js</span>
+<span class="px-2.5 py-1 rounded bg-black/60 border border-cyanCore/20 text-gray-300">MQTT WebSockets</span>
+<span class="px-2.5 py-1 rounded bg-black/60 border border-cyanCore/20 text-gray-300">PostgreSQL</span>
+</div>
+<div class="mt-4 pt-4 border-t border-cyanCore/10 flex items-center gap-4 font-mono text-xs">
+<span class="text-gray-400">STREAMING: Real-Time</span>
+<span class="text-gray-400">FORECAST HORIZON: 24-hr</span>
+</div>
+</div>
+</div>
+</section>
+<!-- SECTION 04: Technical Matrix & Toolchain -->
+<section class="space-y-6" id="section-matrix">
+<div class="flex items-center justify-between border-b border-cyanCore/20 pb-3">
+<h2 class="font-mono text-sm tracking-widest text-cyanCore flex items-center gap-2 uppercase">
+<span class="w-2 h-2 rounded-full bg-cyanCore"></span> 04 // Technical Matrix &amp; Toolchain
+          </h2>
+<span class="font-mono text-xs text-gray-500">SYSTEM CAPABILITIES</span>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+<!-- Column 1: Core Languages -->
+<div class="p-4 rounded-lg bg-gunmetal/40 border border-cyanCore/20 space-y-3">
+<h4 class="font-mono text-xs text-cyanCore font-bold tracking-wider">LANGUAGES &amp; RUNTIMES</h4>
+<div class="space-y-2 font-mono text-xs">
+<div class="flex justify-between items-center bg-black/40 p-2 rounded">
+<span>TypeScript / JavaScript</span><span class="text-cyanCore">95%</span>
+</div>
+<div class="flex justify-between items-center bg-black/40 p-2 rounded">
+<span>Python 3.x</span><span class="text-cyanCore">92%</span>
+</div>
+<div class="flex justify-between items-center bg-black/40 p-2 rounded">
+<span>Java / C++</span><span class="text-cyanCore">80%</span>
+</div>
+<div class="flex justify-between items-center bg-black/40 p-2 rounded">
+<span>SQL / NoSQL</span><span class="text-cyanCore">88%</span>
+</div>
+</div>
+</div>
+<!-- Column 2: Frameworks & Engineering -->
+<div class="p-4 rounded-lg bg-gunmetal/40 border border-cyanCore/20 space-y-3">
+<h4 class="font-mono text-xs text-cyanCore font-bold tracking-wider">FRAMEWORKS &amp; ARCHITECTURE</h4>
+<div class="space-y-2 font-mono text-xs">
+<div class="flex justify-between items-center bg-black/40 p-2 rounded">
+<span>React.js / Next.js</span><span class="text-cyanCore">Advanced</span>
+</div>
+<div class="flex justify-between items-center bg-black/40 p-2 rounded">
+<span>Node.js / Express</span><span class="text-cyanCore">Advanced</span>
+</div>
+<div class="flex justify-between items-center bg-black/40 p-2 rounded">
+<span>FastAPI / Flask</span><span class="text-cyanCore">Advanced</span>
+</div>
+<div class="flex justify-between items-center bg-black/40 p-2 rounded">
+<span>Tailwind CSS</span><span class="text-cyanCore">Mastery</span>
+</div>
+</div>
+</div>
+<!-- Column 3: AI/ML & DevOps -->
+<div class="p-4 rounded-lg bg-gunmetal/40 border border-cyanCore/20 space-y-3">
+<h4 class="font-mono text-xs text-cyanCore font-bold tracking-wider">AI / CLOUD / INFRA</h4>
+<div class="space-y-2 font-mono text-xs">
+<div class="flex justify-between items-center bg-black/40 p-2 rounded">
+<span>PyTorch / Scikit-Learn</span><span class="text-cyanCore">Proficient</span>
+</div>
+<div class="flex justify-between items-center bg-black/40 p-2 rounded">
+<span>Docker &amp; Containers</span><span class="text-cyanCore">Proficient</span>
+</div>
+<div class="flex justify-between items-center bg-black/40 p-2 rounded">
+<span>Git / CI-CD Pipelines</span><span class="text-cyanCore">Advanced</span>
+</div>
+<div class="flex justify-between items-center bg-black/40 p-2 rounded">
+<span>Vector Embeddings</span><span class="text-cyanCore">Active</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- SECTION 05: Co-curricular & Leadership -->
+<section class="space-y-6" id="section-leadership">
+<div class="flex items-center justify-between border-b border-cyanCore/20 pb-3">
+<h2 class="font-mono text-sm tracking-widest text-cyanCore flex items-center gap-2 uppercase">
+<span class="w-2 h-2 rounded-full bg-cyanCore"></span> 05 // Co-curricular &amp; Leadership
+          </h2>
+<span class="font-mono text-xs text-gray-500">INITIATIVES</span>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+<div class="p-5 rounded-lg bg-gunmetal/50 border border-cyanCore/20">
+<div class="flex items-center gap-3 mb-2">
+<span class="material-symbols-outlined text-cyanCore">group_work</span>
+<h4 class="text-sm font-bold text-white">Technical Mentorship &amp; Workshops</h4>
+</div>
+<p class="font-body text-xs text-gray-300 leading-relaxed">
+              Spearheading developer peer coding circles and student tech symposiums at SIESCOMS, guiding cohorts in clean architecture, algorithmic thinking, and modern web frameworks.
+            </p>
+</div>
+<div class="p-5 rounded-lg bg-gunmetal/50 border border-cyanCore/20">
+<div class="flex items-center gap-3 mb-2">
+<span class="material-symbols-outlined text-cyanCore">terminal</span>
+<h4 class="text-sm font-bold text-white">Hackathon Core Contributor</h4>
+</div>
+<p class="font-body text-xs text-gray-300 leading-relaxed">
+              Active participant in rapid prototyping sprints and collegiate hackathons, leading full-stack implementations from concept ideation to deployment under strict deadlines.
+            </p>
+</div>
+</div>
+</section>
+<!-- SECTION 06: Contact Console -->
+<section class="space-y-6" id="section-contact">
+<div class="flex items-center justify-between border-b border-cyanCore/20 pb-3">
+<h2 class="font-mono text-sm tracking-widest text-cyanCore flex items-center gap-2 uppercase">
+<span class="w-2 h-2 rounded-full bg-cyanCore"></span> 06 // Contact Console
+          </h2>
+<span class="font-mono text-xs text-gray-500">TRANSMISSION CHANNEL</span>
+</div>
+<div class="p-6 rounded-xl bg-gunmetal/80 border border-cyanCore/30 space-y-4">
+<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+<div>
+<h3 class="text-lg font-bold font-sans text-white">Initiate Communications Protocol</h3>
+<p class="font-body text-xs text-gray-400 mt-1">Open for SDE roles, collaboration, and applied research inquiries.</p>
+</div>
+<div class="font-mono text-xs text-cyanCore px-3 py-1 rounded bg-cyanCore/10 border border-cyanCore/30 self-start sm:self-auto">
+              ID: ironcodedK
+            </div>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 font-mono text-xs">
+<a class="flex items-center gap-2 p-3 rounded bg-black/60 border border-cyanCore/20 hover:border-cyanCore hover:text-cyanCore transition" href="mailto:karna.bhosle@example.com">
+<span class="material-symbols-outlined text-sm text-cyanCore">mail</span>
+<span>EMAIL CONSOLE</span>
+</a>
+<a class="flex items-center gap-2 p-3 rounded bg-black/60 border border-cyanCore/20 hover:border-cyanCore hover:text-cyanCore transition" href="https://github.com" rel="noreferrer" target="_blank">
+<span class="material-symbols-outlined text-sm text-cyanCore">code</span>
+<span>GITHUB // ironcodedK</span>
+</a>
+<a class="flex items-center gap-2 p-3 rounded bg-black/60 border border-cyanCore/20 hover:border-cyanCore hover:text-cyanCore transition" href="https://linkedin.com" rel="noreferrer" target="_blank">
+<span class="material-symbols-outlined text-sm text-cyanCore">link</span>
+<span>LINKEDIN // KARNA</span>
+</a>
+</div>
+</div>
+</section>
+</main>
+</div>
+<!-- Portfolio Persistent Footer -->
+<footer class="w-full border-t border-cyanCore/15 py-4 px-6 font-mono text-[11px] text-gray-500 flex flex-col sm:flex-row items-center justify-between gap-2 bg-black">
+<span>SYSTEM: KARNA BHOSLE • SIESCOMS (2025–2027)</span>
+<div class="flex items-center gap-4">
+<span class="text-cyanCore">PORTFOLIO_ID: ironcodedK</span>
+<span>OLED MATRIX ONLINE</span>
+</div>
+</footer>
+</div>
+<!-- ========================================== -->
+<!-- 4. AUDIO SYNTHESIZER & TIMED SCRIPT LOGIC  -->
+<!-- ========================================== -->
+<script>
+  const trigger = document.getElementById('reactorTrigger');
+  const promptText = document.getElementById('promptText');
+  const wrapper = document.getElementById('reactorWrapper');
+  const status = document.getElementById('reactorStatus');
+  const energyBar = document.getElementById('energyBar');
+  const matrixVal = document.getElementById('matrixVal');
+  const fluxVal = document.getElementById('fluxVal');
+  const statusBeacon = document.getElementById('statusBeacon');
+  const sysStatusText = document.getElementById('sysStatusText');
+  
+  const pulseRing1 = document.getElementById('pulseRing1');
+  const pulseRing2 = document.getElementById('pulseRing2');
+
+  const flashOverlay = document.getElementById('repulsorFlashOverlay');
+  const whiteFlare = document.getElementById('repulsorWhiteFlare');
+  const repulsorCard = document.getElementById('repulsorCard');
+
+  const splashScreen = document.getElementById('splashScreen');
+  const portfolioScreen = document.getElementById('portfolioScreen');
+  const reengageBtn = document.getElementById('reengageBtn');
+
+  let isIgnited = false;
+
+  // Web Audio API sound cue synthesizer for cinematic reactor initiation
+  function playReactorSoundSequence() {
+    try {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) return;
+      const ctx = new AudioCtx();
+
+      // 1. Initial surge hum & mechanical rising pitch
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(70, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(940, ctx.currentTime + 1.5);
+      
+      gain.gain.setValueAtTime(0.01, ctx.currentTime);
+      gain.gain.linearRampToValueAtTime(0.22, ctx.currentTime + 1.1);
+      gain.gain.linearRampToValueAtTime(0.001, ctx.currentTime + 1.7);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 1.7);
+
+      // 2. High-energy Repulsor Blast discharge sound
+      setTimeout(() => {
+        const blastOsc = ctx.createOscillator();
+        const blastGain = ctx.createGain();
+        blastOsc.type = 'sine';
+        blastOsc.frequency.setValueAtTime(260, ctx.currentTime);
+        blastOsc.frequency.exponentialRampToValueAtTime(28, ctx.currentTime + 0.9);
+
+        blastGain.gain.setValueAtTime(0.5, ctx.currentTime);
+        blastGain.gain.linearRampToValueAtTime(0.01, ctx.currentTime + 0.9);
+
+        blastOsc.connect(blastGain);
+        blastGain.connect(ctx.destination);
+        blastOsc.start();
+        blastOsc.stop(ctx.currentTime + 0.9);
+      }, 1250);
+    } catch (e) {
+      console.warn('Web Audio note:', e);
+    }
+  }
+
+  // Live rapid tick counter: 1% -> 14% -> 38% -> 72% -> 95% -> 100%
+  function startLiveTelemetryCountup() {
+    const energySteps = [
+      { t: 0,   val: 1,   flux: '12.4 GW' },
+      { t: 250, val: 14,  flux: '26.8 GW' },
+      { t: 500, val: 38,  flux: '45.1 GW' },
+      { t: 800, val: 72,  flux: '78.5 GW' },
+      { t: 1100, val: 95, flux: '94.2 GW' },
+      { t: 1300, val: 100, flux: '100.0 GW' }
+    ];
+
+    energySteps.forEach(step => {
+      setTimeout(() => {
+        matrixVal.textContent = step.val + '%';
+        if (fluxVal) fluxVal.textContent = step.flux;
+        energyBar.style.width = step.val + '%';
+
+        if (step.val === 100) {
+          energyBar.classList.remove('bg-cyanCore');
+          energyBar.classList.add('bg-white');
+          energyBar.style.boxShadow = '0 0 25px #ffffff, 0 0 50px #61e8ff';
+          matrixVal.className = 'text-white font-bold animate-pulse';
+          if (fluxVal) fluxVal.className = 'text-white font-bold animate-pulse';
+        }
+      }, step.t);
+    });
+  }
+
+  function triggerIgnition() {
+    if (isIgnited) return;
+    isIgnited = true;
+
+    // 1. Synthesize audio
+    playReactorSoundSequence();
+
+    // 2. Add igniting class to trigger ring-by-ring CSS keyframe expansions
+    document.body.classList.add('igniting');
+
+    // 3. Trigger shockwave pulse rings
+    pulseRing1.classList.add('pulse-ring-active');
+    setTimeout(() => {
+      pulseRing2.classList.add('pulse-ring-active');
+    }, 250);
+
+    // 4. Update Header & Status Text
+    promptText.style.opacity = '0';
+    promptText.style.transform = 'translateY(-10px)';
+    sysStatusText.textContent = 'SYS.STATUS // OVERDRIVE_DISCHARGE';
+    sysStatusText.classList.add('text-white');
+    statusBeacon.classList.remove('bg-cyanCore');
+    statusBeacon.classList.add('bg-white');
+
+    status.innerHTML = '<span class="text-white font-bold tracking-widest animate-pulse">⚡ OVERCHARGING FLUX CORE... EXPANDING COILS</span>';
+
+    // 5. Start rapid energy matrix count-up: 1% -> 100%
+    startLiveTelemetryCountup();
+
+    // 6. At 1.25s, trigger Iron Man Repulsor Blast forward surge
+    setTimeout(() => {
+      wrapper.classList.add('repulsor-blast-active');
+
+      // 7. Full-screen Blinding Repulsor Flash Overdrive
+      setTimeout(() => {
+        flashOverlay.classList.add('flash-visible');
+        whiteFlare.style.opacity = '1';
+
+        setTimeout(() => {
+          whiteFlare.style.opacity = '0.4';
+          repulsorCard.style.opacity = '1';
+
+          // 8. Smoothly reveal Desktop Portfolio Screen
+          setTimeout(() => {
+            // Fade out the flash
+            flashOverlay.classList.remove('flash-visible');
+            repulsorCard.style.opacity = '0';
+
+            // Show Portfolio
+            portfolioScreen.classList.add('portfolio-revealed');
+            portfolioScreen.scrollTop = 0;
+
+            // Reset splash screen underlying states quietly
+            document.body.classList.remove('igniting');
+            wrapper.classList.remove('repulsor-blast-active');
+            pulseRing1.classList.remove('pulse-ring-active');
+            pulseRing2.classList.remove('pulse-ring-active');
+
+            isIgnited = false;
+          }, 850);
+
+        }, 320);
+      }, 350);
+
+    }, 1250);
+  }
+
+  // Re-engage / Replay ignition listener
+  function resetAndReengage() {
+    portfolioScreen.classList.remove('portfolio-revealed');
+    
+    // Reset splash screen counters
+    matrixVal.textContent = '1%';
+    matrixVal.className = 'text-cyanCore font-bold';
+    if (fluxVal) {
+      fluxVal.textContent = '12.4 GW';
+      fluxVal.className = 'text-cyanCore font-bold';
+    }
+    energyBar.style.width = '1%';
+    energyBar.className = 'h-full bg-cyanCore rounded-sm transition-all duration-100 shadow-[0_0_10px_#61e8ff]';
+    energyBar.style.boxShadow = '';
+
+    promptText.style.opacity = '1';
+    promptText.style.transform = 'translateY(0)';
+    sysStatusText.textContent = 'SYS.STATUS // CORE_STANDBY';
+    sysStatusText.classList.remove('text-white');
+    statusBeacon.classList.add('bg-cyanCore');
+    statusBeacon.classList.remove('bg-white');
+
+    status.innerHTML = '<span class="w-2 h-2 rounded-full bg-cyanCore animate-ping"></span> SYSTEM READY • CLICK ARC REACTOR TO ENGAGE';
+
+    isIgnited = false;
+  }
+
+  trigger.addEventListener('click', triggerIgnition);
+  promptText.addEventListener('click', triggerIgnition);
+  if (reengageBtn) {
+    reengageBtn.addEventListener('click', resetAndReengage);
+  }
+</script>
+</body></html>

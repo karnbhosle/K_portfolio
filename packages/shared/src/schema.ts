@@ -2,6 +2,7 @@ import { z } from "zod";
 
 const text = z.string().trim().min(1);
 const optionalText = text.nullable().default(null);
+const httpsUrl = z.url().refine((url) => new URL(url).protocol === "https:", "Use an HTTPS URL.");
 
 /** Assets are approved local public files, never unverified remote hotlinks. */
 export const assetSchema = z.object({
@@ -15,6 +16,15 @@ export const assetSchema = z.object({
 
 const optionalAsset = assetSchema.nullable().default(null);
 
+const timeZone = text.refine((value) => {
+  try {
+    new Intl.DateTimeFormat("en-US", { timeZone: value });
+    return true;
+  } catch {
+    return false;
+  }
+}, "Use an IANA time zone such as Asia/Kolkata.");
+
 export const profileSchema = z.object({
   displayName: text,
   fullName: text,
@@ -22,15 +32,19 @@ export const profileSchema = z.object({
   educationLine: text,
   institution: text,
   location: text,
+  timeZone: timeZone.default("Asia/Kolkata"),
   email: z.email(),
   emailHref: z.string().startsWith("mailto:"),
   phoneDisplay: text,
   phoneHref: z.string().regex(/^tel:\+[0-9]+$/),
+  github: httpsUrl.nullable().default(null),
+  availability: optionalText,
   introduction: text,
   headline: text,
   focusAreas: z.array(text).min(1),
   languages: z.array(text).min(1),
   languageProficiency: text,
+  portrait: optionalAsset,
   publicResume: optionalAsset,
 }).strict();
 
@@ -52,11 +66,18 @@ export const trainingSchema = z.object({
   certificate: optionalAsset,
 }).strict();
 
+/** One step of a project's processing flow. Every field must be traceable to the CV. */
+export const pipelineStageSchema = z.object({
+  title: text,
+  detail: optionalText,
+  tools: z.array(text).default([]),
+}).strict();
+
 export const projectSchema = z.object({
   id: text,
   name: text,
   subtitle: text,
-  repository: z.url().refine((url) => new URL(url).protocol === "https:", "Repositories require HTTPS."),
+  repository: httpsUrl,
   summary: text,
   stack: z.array(text).min(1),
   highlights: z.array(text).length(3),
@@ -65,6 +86,8 @@ export const projectSchema = z.object({
     database: text,
     note: text,
   }).strict(),
+  pipeline: z.array(pipelineStageSchema).default([]),
+  features: z.array(text).default([]),
   details: z.array(text).min(1),
   screenshot: optionalAsset,
   visual: z.enum(["air", "finance"]),
@@ -124,21 +147,48 @@ const singleLine = z.string().trim().refine(
 
 /** Strict shared validation prevents unexpected properties from entering storage. */
 export const contactSchema = z.object({
-  name: singleLine.min(contactFieldLimits.name.min, "Please enter at least 2 characters.")
+  name: singleLine.min(contactFieldLimits.name.min, "Enter at least 2 characters.")
     .max(contactFieldLimits.name.max, "Use 100 characters or fewer."),
   email: z.string().trim().max(contactFieldLimits.email.max, "Use 254 characters or fewer.")
-    .email("Enter a valid email address."),
-  subject: singleLine.min(contactFieldLimits.subject.min, "Please enter at least 3 characters.")
+    .email("Enter an email address like name@example.com."),
+  subject: singleLine.min(contactFieldLimits.subject.min, "Enter at least 3 characters.")
     .max(contactFieldLimits.subject.max, "Use 150 characters or fewer."),
-  message: z.string().trim().min(contactFieldLimits.message.min, "Please enter at least 10 characters.")
+  message: z.string().trim().min(contactFieldLimits.message.min, "Enter at least 10 characters.")
     .max(contactFieldLimits.message.max, "Use 5,000 characters or fewer.")
-    .refine((value) => !value.includes("\u0000"), "The message contains an unsupported character."),
+    .refine((value) => !value.includes("\u0000"), "Remove the unsupported character from your message."),
   website: z.string().trim().max(contactFieldLimits.website.max).optional().default(""),
 }).strict();
+
+/**
+ * Optional `Idempotency-Key` request header for POST /api/contact. Retrying with the
+ * same key returns the original receipt instead of saving a duplicate message.
+ */
+export const idempotencyKeySchema = z.string().regex(/^[A-Za-z0-9_-]{16,128}$/, "Use 16–128 letters, digits, - or _.");
+
+export const notificationStatuses = ["pending", "accepted", "failed", "not_configured"] as const;
+export const notificationStatusSchema = z.enum(notificationStatuses);
+
+/** Every JSON body POST /api/contact can return. Clients parse responses with this. */
+export const contactResponseSchema = z.discriminatedUnion("received", [
+  z.object({
+    received: z.literal(true),
+    notification: notificationStatusSchema,
+    message: z.string(),
+    replayed: z.boolean().optional(),
+  }),
+  z.object({
+    received: z.literal(false),
+    message: z.string(),
+    errors: z.record(z.string(), z.array(z.string())).optional(),
+  }),
+]);
 
 export type Asset = z.infer<typeof assetSchema>;
 export type Portfolio = z.infer<typeof portfolioSchema>;
 export type Profile = z.infer<typeof profileSchema>;
 export type Project = z.infer<typeof projectSchema>;
+export type PipelineStage = z.infer<typeof pipelineStageSchema>;
 export type ContactInput = z.infer<typeof contactSchema>;
 export type ContactFields = z.input<typeof contactSchema>;
+export type NotificationStatus = z.infer<typeof notificationStatusSchema>;
+export type ContactResponse = z.infer<typeof contactResponseSchema>;

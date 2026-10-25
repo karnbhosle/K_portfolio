@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+
+<html class="h-full bg-black scroll-smooth" lang="en" style=""><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>KARNA / CORE — OLED Portfolio (Left Navigation &amp; Ambient Reactor)</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&amp;family=JetBrains+Mono:wght@400;500;700&amp;family=Inter:wght@300;400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            oled: '#000000',
+            cyanCore: '#61e8ff',
+            cyanGlow: '#218cff',
+            goldCore: '#c98a45',
+            gunmetal: '#0c141d',
+            gunmetalBorder: '#162536'
+          },
+          fontFamily: {
+            sans: ['"Space Grotesk"', 'sans-serif'],
+            body: ['"Inter"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace']
+          }
+        }
+      }
+    }
+  </script>
+<style>
+    /* OLED Zero-Emission Background & Ambient Blinking Reactor */
+    body {
+      background-color: #000000 !important;
+    }
+    @keyframes ambientCoreBlink {
+      0%, 100% { opacity: 0.22; filter: drop-shadow(0 0 35px rgba(97,232,255,0.25)); }
+      25% { opacity: 0.35; filter: drop-shadow(0 0 55px rgba(97,232,255,0.45)); }
+      50% { opacity: 0.12; filter: drop-shadow(0 0 20px rgba(97,232,255,0.15)); }
+      70% { opacity: 0.42; filter: drop-shadow(0 0 70px rgba(97,232,255,0.6)); }
+      85% { opacity: 0.26; }
+    }
+    @keyframes innerSpin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    @keyframes outerSpinRev {
+      from { transform: rotate(360deg); }
+      to { transform: rotate(0deg); }
+    }
+    .ambient-reactor-pulse {
+      animation: ambientCoreBlink 6s ease-in-out infinite;
+    }
+    .ambient-spin-cw {
+      animation: innerSpin 45s linear infinite;
+    }
+    .ambient-spin-ccw {
+      animation: outerSpinRev 60s linear infinite;
+    }
+
+    /* Fixed Reactor Placement: Dead-centered exclusively within the remaining scrollable content area */
+    .pinned-reactor-center {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 0;
+      pointer-events: none;
+      opacity: 0.28;
+    }
+
+    /* On desktop (sidebar visible, width: 280px), center is exactly calc(50% + 140px) */
+    @media (min-width: 768px) {
+      .pinned-reactor-center {
+        left: calc(50% + 140px) !important;
+      }
+    }
+
+    /* Custom scrollbar for cyber workstation look */
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #000000;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #162536;
+      border-radius: 3px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #61e8ff;
+    }
+  </style>
+</head>
+<body class="bg-black text-[#EFF8FF] font-body relative overflow-x-hidden selection:bg-cyan-500 selection:text-black">
+<!-- ======================================================== -->
+<!-- FIXED PINNED BLINKING ARC REACTOR CENTERED IN CONTENT     -->
+<!-- ======================================================== -->
+<div class="pinned-reactor-center w-[580px] h-[580px] pointer-events-none z-0 ambient-reactor-pulse">
+<div class="relative w-full h-full flex items-center justify-center">
+<div class="absolute inset-0 rounded-full bg-cyanCore/15 blur-[90px]"></div>
+<svg class="absolute inset-0 w-full h-full ambient-spin-ccw" viewbox="0 0 400 400">
+<circle cx="200" cy="200" fill="none" r="185" stroke="#61e8ff" stroke-dasharray="24 14 6 14" stroke-opacity="0.35" stroke-width="2"></circle>
+<circle cx="200" cy="200" fill="none" r="170" stroke="#218cff" stroke-dasharray="4 8" stroke-opacity="0.25" stroke-width="1"></circle>
+<circle cx="200" cy="20" fill="#61e8ff" r="5"></circle>
+<circle cx="355" cy="110" fill="#61e8ff" r="5"></circle>
+<circle cx="355" cy="290" fill="#61e8ff" r="5"></circle>
+<circle cx="200" cy="380" fill="#61e8ff" r="5"></circle>
+<circle cx="45" cy="290" fill="#c98a45" r="5"></circle>
+<circle cx="45" cy="110" fill="#61e8ff" r="5"></circle>
+</svg>
+<svg class="absolute inset-16 w-[calc(100%-128px)] h-[calc(100%-128px)] ambient-spin-cw" viewbox="0 0 260 260">
+<circle cx="130" cy="130" fill="none" r="110" stroke="#162738" stroke-width="12"></circle>
+<circle cx="130" cy="130" fill="none" r="110" stroke="#61e8ff" stroke-dasharray="14 10" stroke-opacity="0.65" stroke-width="2"></circle>
+<g fill="#04090f" stroke="#61e8ff" stroke-width="1.2">
+<rect height="18" rx="2" stroke="#c98a45" width="12" x="124" y="22"></rect>
+<rect height="18" rx="2" stroke="#c98a45" transform="rotate(36 130 130)" width="12" x="124" y="22"></rect>
+<rect height="18" rx="2" stroke="#61e8ff" transform="rotate(72 130 130)" width="12" x="124" y="22"></rect>
+<rect height="18" rx="2" stroke="#c98a45" transform="rotate(108 130 130)" width="12" x="124" y="22"></rect>
+<rect height="18" rx="2" stroke="#61e8ff" transform="rotate(144 130 130)" width="12" x="124" y="22"></rect>
+<rect height="18" rx="2" stroke="#c98a45" transform="rotate(180 130 130)" width="12" x="124" y="22"></rect>
+<rect height="18" rx="2" stroke="#61e8ff" transform="rotate(216 130 130)" width="12" x="124" y="22"></rect>
+<rect height="18" rx="2" stroke="#c98a45" transform="rotate(252 130 130)" width="12" x="124" y="22"></rect>
+<rect height="18" rx="2" stroke="#61e8ff" transform="rotate(288 130 130)" width="12" x="124" y="22"></rect>
+<rect height="18" rx="2" stroke="#c98a45" transform="rotate(324 130 130)" width="12" x="124" y="22"></rect>
+</g>
+</svg>
+<div class="w-32 h-32 rounded-full bg-[#030910]/90 border-2 border-cyanCore/70 flex items-center justify-center shadow-[inset_0_0_20px_rgba(97,232,255,0.6)]">
+<span class="font-mono text-cyanCore font-bold text-sm tracking-widest">[KB]</span>
+</div>
+</div>
+</div>
+<!-- Page Layout Wrapper -->
+<div class="flex min-h-screen relative z-10">
+<!-- ======================================================== -->
+<!-- PERSISTENT VERTICAL STATIONARY LEFT NAVIGATION BAR       -->
+<!-- ======================================================== -->
+<aside class="fixed top-0 bottom-0 left-0 w-[280px] h-screen bg-black/95 backdrop-blur-md border-r border-gunmetalBorder flex flex-col justify-between p-6 z-40 hidden md:flex">
+<!-- Brand & Status -->
+<div>
+<div class="flex items-center space-x-3 pb-6 border-b border-gunmetalBorder">
+<div class="w-10 h-10 rounded-full bg-[#061019] border border-cyanCore flex items-center justify-center shadow-[0_0_12px_rgba(97,232,255,0.4)]">
+<span class="font-mono font-bold text-xs text-cyanCore">KB</span>
+</div>
+<div>
+<div class="font-sans font-bold text-sm text-white tracking-wider">KARNA / CORE</div>
+<div class="font-mono text-[10px] text-cyanCore/70 flex items-center gap-1.5">
+<span class="w-1.5 h-1.5 rounded-full bg-cyanCore animate-ping"></span>
+              SDE // ONLINE
+            </div>
+</div>
+</div>
+<!-- Section Navigation Links -->
+<nav class="mt-8 space-y-1.5" id="leftNav">
+<div class="font-mono text-[10px] uppercase text-gray-400 font-bold tracking-widest px-3 mb-2">TELEMETRY ROUTING</div>
+<a class="group flex items-center justify-between px-3 py-2.5 rounded-md hover:bg-[#0d1722] border border-transparent hover:border-cyanCore/30 transition-all text-xs font-mono text-gray-300 hover:text-cyanCore" href="#know-karna">
+<span class="flex items-center gap-2.5">
+<span class="text-cyanCore font-bold">01</span>
+<span class="">Know Karna</span>
+</span>
+<span class="w-1.5 h-1.5 rounded-full bg-cyanCore opacity-0 group-hover:opacity-100 transition-opacity"></span>
+</a>
+<a class="group flex items-center justify-between px-3 py-2.5 rounded-md hover:bg-[#0d1722] border border-transparent hover:border-cyanCore/30 transition-all text-xs font-mono text-gray-300 hover:text-cyanCore" href="#qualifications">
+<span class="flex items-center gap-2.5">
+<span class="text-cyanCore font-bold">02</span>
+<span class="">Qualifications</span>
+</span>
+<span class="w-1.5 h-1.5 rounded-full bg-cyanCore opacity-0 group-hover:opacity-100 transition-opacity"></span>
+</a>
+<a class="group flex items-center justify-between px-3 py-2.5 rounded-md hover:bg-[#0d1722] border border-transparent hover:border-cyanCore/30 transition-all text-xs font-mono text-gray-300 hover:text-cyanCore" href="#projects">
+<span class="flex items-center gap-2.5">
+<span class="text-cyanCore font-bold">03</span>
+<span class="">Projects</span>
+</span>
+<span class="w-1.5 h-1.5 rounded-full bg-cyanCore opacity-0 group-hover:opacity-100 transition-opacity"></span>
+</a>
+<a class="group flex items-center justify-between px-3 py-2.5 rounded-md hover:bg-[#0d1722] border border-transparent hover:border-cyanCore/30 transition-all text-xs font-mono text-gray-300 hover:text-cyanCore" href="#technical-skills">
+<span class="flex items-center gap-2.5">
+<span class="text-cyanCore font-bold">04</span>
+<span class="">Tech Matrix</span>
+</span>
+<span class="w-1.5 h-1.5 rounded-full bg-cyanCore opacity-0 group-hover:opacity-100 transition-opacity"></span>
+</a>
+<a class="group flex items-center justify-between px-3 py-2.5 rounded-md hover:bg-[#0d1722] border border-transparent hover:border-cyanCore/30 transition-all text-xs font-mono text-gray-300 hover:text-cyanCore" href="#activities">
+<span class="flex items-center gap-2.5">
+<span class="text-cyanCore font-bold">05</span>
+<span class="">Activities</span>
+</span>
+<span class="w-1.5 h-1.5 rounded-full bg-cyanCore opacity-0 group-hover:opacity-100 transition-opacity"></span>
+</a>
+<a class="group flex items-center justify-between px-3 py-2.5 rounded-md hover:bg-[#0d1722] border border-transparent hover:border-cyanCore/30 transition-all text-xs font-mono text-gray-300 hover:text-cyanCore" href="#contact">
+<span class="flex items-center gap-2.5">
+<span class="text-cyanCore font-bold">06</span>
+<span class="">Contact Me</span>
+</span>
+<span class="w-1.5 h-1.5 rounded-full bg-cyanCore opacity-0 group-hover:opacity-100 transition-opacity"></span>
+</a>
+</nav>
+</div>
+<!-- Quick Action & Footer Data -->
+<div class="pt-6 border-t border-gunmetalBorder space-y-4">
+<a class="w-full py-2.5 px-4 rounded bg-[#0a1b2a] hover:bg-cyanCore hover:text-black border border-cyanCore/40 font-mono text-xs font-semibold tracking-wider text-cyanCore text-center block transition-all shadow-[0_0_15px_rgba(97,232,255,0.15)]" href="#contact">
+          INITIALIZE CONTACT ↗
+        </a>
+<div class="text-[10px] font-mono text-gray-400 space-y-1">
+<div class="">SIESCOMS • MCA '27</div>
+<div class="text-cyanCore/80">OLED OPTIMIZED [TRUE #000]</div>
+</div>
+</div>
+</aside>
+<!-- Mobile Top Navigation Bar (Shown on small screens) -->
+<header class="md:hidden fixed top-0 left-0 right-0 bg-black/95 border-b border-gunmetalBorder px-4 py-3 flex items-center justify-between z-50">
+<div class="flex items-center space-x-2">
+<span class="font-mono font-bold text-xs text-cyanCore">[KB]</span>
+<span class="font-sans font-bold text-xs text-white">KARNA / CORE</span>
+</div>
+<div class="flex items-center space-x-2 font-mono text-xs overflow-x-auto">
+<a class="px-2 py-1 text-cyanCore" href="#know-karna">01</a>
+<a class="px-2 py-1 text-gray-400" href="#qualifications">02</a>
+<a class="px-2 py-1 text-gray-400" href="#projects">03</a>
+<a class="px-2 py-1 text-gray-400" href="#technical-skills">04</a>
+<a class="px-2 py-1 bg-cyanCore/20 text-cyanCore rounded" href="#contact">Contact</a>
+</div>
+</header>
+<!-- ======================================================== -->
+<!-- MAIN CONTENT SCROLL AREA (Offset by 280px Left Nav)       -->
+<!-- ======================================================== -->
+<main class="flex-1 md:ml-[280px] min-h-screen relative p-6 sm:p-10 lg:p-16 max-w-5xl">
+<!-- ======================================================== -->
+<!-- 01. KNOW KARNA                                           -->
+<!-- ======================================================== -->
+<section class="pt-12 md:pt-6 pb-24 border-b border-gunmetalBorder/60 scroll-mt-6" id="know-karna">
+<!-- Eyebrow -->
+<div class="flex items-center space-x-2 mb-4">
+<span class="px-2.5 py-1 rounded bg-[#061421] border border-cyanCore/40 font-mono text-xs text-cyanCore tracking-wider">KARNA / CORE</span>
+<span class="font-mono text-xs text-gray-400">SYS_ID: KB-0924</span>
+</div>
+<h1 class="font-sans font-bold text-4xl sm:text-5xl lg:text-6xl text-white tracking-tight mb-3">
+          Karna Bhosle
+        </h1>
+<p class="font-sans text-lg sm:text-xl text-cyanCore font-medium mb-2">
+          Aspiring Software Development Engineer
+        </p>
+<p class="font-mono text-xs sm:text-sm text-[#A7BACB] mb-8">
+          MCA Candidate • SIESCOMS • 2025-2027
+        </p>
+<!-- DEDICATED HERO PHOTO SLOT CARD ONLY (1:1 Aspect cyber cyan) -->
+<div class="mb-10 max-w-sm">
+<div class="p-6 rounded-xl bg-black/80 backdrop-blur-sm border-2 border-dashed border-cyanCore/50 hover:border-cyanCore relative flex flex-col items-center justify-center text-center transition-all group cursor-pointer shadow-[0_0_30px_rgba(97,232,255,0.08)]">
+<div class="absolute top-3 right-3 font-mono text-[9px] text-cyanCore bg-cyanCore/10 px-2 py-0.5 rounded border border-cyanCore/30">1:1 ASPECT</div>
+<div class="w-28 h-28 aspect-square rounded-full bg-[#08121d] border border-cyanCore/70 flex items-center justify-center mb-3 group-hover:scale-105 group-hover:border-cyanCore shadow-[0_0_20px_rgba(97,232,255,0.15)] transition-all">
+<svg class="w-10 h-10 text-cyanCore/80 group-hover:text-cyanCore transition-colors" fill="none" stroke="currentColor" viewbox="0 0 24 24">
+<path d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"></path>
+<path d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"></path>
+</svg>
+</div>
+<span class="font-mono text-sm text-white font-semibold group-hover:text-cyanCore transition-colors tracking-wider">PROFILE PHOTO SLOT</span>
+<span class="font-mono text-[11px] text-gray-400 mt-1">Click or drop headshot • Ready for upload</span>
+</div>
+</div>
+<!-- Headline & Bio -->
+<h2 class="font-sans text-xl sm:text-2xl text-cyanCore font-semibold mb-4">
+          Engineering ideas into intelligent experiences.
+        </h2>
+<p class="font-body text-[#A7BACB] text-base leading-relaxed max-w-2xl mb-8">
+          I'm Karna Bhosle, an aspiring Software Development Engineer pursuing my MCA at SIES College of Management Studies. I build full-stack applications and applied machine-learning systems, connecting interfaces, APIs, databases, and ML services. My projects include CorpusAI for financial lifecycle planning, and AeroSense for air-quality prediction and visualization.
+        </p>
+<!-- Actions -->
+<div class="flex flex-wrap items-center gap-4 mb-8">
+<a class="px-6 py-3 rounded bg-cyanCore hover:bg-white text-black font-mono text-sm font-bold tracking-wider transition-all shadow-[0_0_20px_rgba(97,232,255,0.4)] flex items-center gap-2" href="#projects">
+            VIEW PROJECTS <span class="">→</span>
+</a>
+<a class="px-6 py-3 rounded bg-[#091522] hover:bg-[#122338] border border-cyanCore/40 text-cyanCore font-mono text-sm font-semibold tracking-wider transition-all" href="#contact">
+            CONTACT ME
+          </a>
+</div>
+<!-- Meta badges -->
+<div class="flex flex-wrap gap-2 mb-6">
+<span class="px-3 py-1 bg-[#061320] border border-gunmetalBorder rounded text-xs font-mono text-gray-300">• Full-stack development</span>
+<span class="px-3 py-1 bg-[#061320] border border-gunmetalBorder rounded text-xs font-mono text-gray-300">• Applied machine learning</span>
+<span class="px-3 py-1 bg-[#061320] border border-gunmetalBorder rounded text-xs font-mono text-gray-300">• API design</span>
+</div>
+<div class="font-mono text-xs text-gray-400 space-y-1">
+<div class=""><span class="text-gray-400">Location:</span> Ghatkopar (West), Mumbai</div>
+<div class=""><span class="text-gray-400">Spoken Languages:</span> English, Hindi, Marathi</div>
+</div>
+</section>
+<!-- ======================================================== -->
+<!-- 02. QUALIFICATIONS                                       -->
+<!-- ======================================================== -->
+<section class="py-20 border-b border-gunmetalBorder/60 scroll-mt-6" id="qualifications">
+<div class="flex items-center space-x-3 mb-10">
+<span class="w-3 h-3 rounded-full bg-cyanCore animate-pulse"></span>
+<h2 class="font-sans font-bold text-2xl sm:text-3xl text-white tracking-tight uppercase">
+            02 / Academic &amp; Professional Qualifications
+          </h2>
+</div>
+<!-- Vertical Timeline -->
+<div class="relative pl-6 border-l-2 border-cyanCore/30 space-y-10 max-w-2xl">
+<!-- Milestone 1: Current MCA -->
+<div class="relative group">
+<span class="absolute -left-[31px] top-1.5 w-4 h-4 rounded-full bg-cyanCore shadow-[0_0_12px_#61e8ff]"></span>
+<div class="p-5 rounded-lg bg-black/80 backdrop-blur-sm border border-cyanCore/50 hover:border-cyanCore transition-all">
+<div class="flex items-center justify-between mb-1">
+<span class="font-sans font-bold text-lg text-white">Master of Computer Applications (MCA)</span>
+<span class="px-2.5 py-0.5 rounded bg-cyanCore/15 border border-cyanCore text-cyanCore font-mono text-[10px] font-semibold">CURRENTLY PURSUING</span>
+</div>
+<p class="text-cyanCore text-sm font-medium">SIES College of Management Studies, Navi Mumbai</p>
+<p class="font-mono text-xs text-gray-400 mt-1">2025 - 2027</p>
+</div>
+</div>
+<!-- Milestone 2: B.Sc. IT -->
+<div class="relative group">
+<span class="absolute -left-[31px] top-1.5 w-4 h-4 rounded-full bg-[#16273a] border border-cyanCore/40"></span>
+<div class="p-5 rounded-lg bg-black/80 backdrop-blur-sm border border-gunmetalBorder hover:border-cyanCore/40 transition-all">
+<span class="font-sans font-bold text-lg text-white">B.Sc. (Information Technology)</span>
+<p class="text-gray-300 text-sm">SIES College of Arts, Science and Commerce</p>
+<p class="font-mono text-xs text-gray-400 mt-1">2021 - 2024</p>
+</div>
+</div>
+<!-- Milestone 3: HSC -->
+<div class="relative group">
+<span class="absolute -left-[31px] top-1.5 w-4 h-4 rounded-full bg-[#16273a] border border-gunmetalBorder"></span>
+<div class="p-5 rounded-lg bg-black/80 backdrop-blur-sm border border-gunmetalBorder">
+<span class="font-sans font-bold text-lg text-white">HSC (State Board)</span>
+<p class="text-gray-300 text-sm">P.V.G's Vidya Bhawan High School &amp; Junior College</p>
+<p class="font-mono text-xs text-gray-400 mt-1">2019 - 2021</p>
+</div>
+</div>
+<!-- Milestone 4: SSC -->
+<div class="relative group">
+<span class="absolute -left-[31px] top-1.5 w-4 h-4 rounded-full bg-[#16273a] border border-gunmetalBorder"></span>
+<div class="p-5 rounded-lg bg-black/80 backdrop-blur-sm border border-gunmetalBorder">
+<span class="font-sans font-bold text-lg text-white">SSC (State Board)</span>
+<p class="text-gray-300 text-sm">SIES A.P.J Kalam Memorial High School</p>
+<p class="font-mono text-xs text-gray-400 mt-1">2018 - 2019</p>
+</div>
+</div>
+</div>
+<!-- Specialized Certification -->
+<div class="mt-12 max-w-2xl p-5 rounded-lg bg-black/80 backdrop-blur-sm border border-cyanCore/30 flex items-start gap-4">
+<div class="w-10 h-10 rounded bg-[#0b1724] border border-cyanCore/50 flex items-center justify-center shrink-0">
+<span class="font-mono text-xs text-cyanCore font-bold">ML</span>
+</div>
+<div>
+<div class="flex items-center gap-2">
+<span class="font-sans font-bold text-white text-base">Machine Learning Training</span>
+<span class="px-2 py-0.5 rounded bg-cyanCore/10 text-cyanCore text-[10px] font-mono">VERIFIED</span>
+</div>
+<p class="text-xs text-gray-400 mt-0.5">Internshala • 8 weeks • Online • April 2024</p>
+</div>
+</div>
+</section>
+<!-- ======================================================== -->
+<!-- 03. PROJECTS (REORDERED: CorpusAI FIRST, AeroSense SECOND) -->
+<!-- ======================================================== -->
+<section class="py-20 border-b border-gunmetalBorder/60 scroll-mt-6" id="projects">
+<div class="flex items-center space-x-3 mb-10">
+<span class="w-3 h-3 rounded-full bg-cyanCore animate-pulse"></span>
+<h2 class="font-sans font-bold text-2xl sm:text-3xl text-white tracking-tight uppercase">
+            03 / Featured Engineering Projects
+          </h2>
+</div>
+<div class="space-y-12">
+<!-- PROJECT 01 (FIRST): CorpusAI -->
+<div class="p-6 sm:p-8 rounded-xl bg-black/80 backdrop-blur-sm border border-[#c98a45]/60 hover:border-[#c98a45] transition-all shadow-[0_0_30px_rgba(201,138,69,0.08)]">
+<div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+<span class="font-mono text-xs text-[#c98a45] tracking-widest font-semibold">PROJECT_REF: CRP-02</span>
+<span class="px-2.5 py-0.5 rounded bg-[#c98a45]/15 text-[#c98a45] font-mono text-[10px]">DOCKER_COMPOSE</span>
+</div>
+<h3 class="font-sans font-bold text-2xl text-white mb-1">CorpusAI</h3>
+<p class="text-sm font-mono text-[#c98a45] mb-4">AI-Powered Financial Lifecycle Planning System</p>
+<p class="text-gray-300 text-sm leading-relaxed mb-6">
+              A financial planning platform combining interactive dashboards, secured APIs, and a modular machine-learning pipeline for personalized financial and retirement planning.
+            </p>
+<ul class="space-y-2 mb-6 font-mono text-xs text-gray-300">
+<li class="flex items-start gap-2">
+<span class="text-[#c98a45]">•</span>
+<span class="">Four-service architecture containerized with Docker Compose.</span>
+</li>
+<li class="flex items-start gap-2">
+<span class="text-[#c98a45]">•</span>
+<span class="">Six-stage ML pipeline covering risk, growth, retirement, inflation, recommendations, and anomaly/segmentation detection.</span>
+</li>
+<li class="flex items-start gap-2">
+<span class="text-[#c98a45]">•</span>
+<span class="">JWT-secured APIs and interactive financial-planning dashboards.</span>
+</li>
+</ul>
+<!-- Tech Chips -->
+<div class="flex flex-wrap gap-1.5 mb-6">
+<span class="px-2.5 py-1 rounded bg-[#061320] border border-gunmetalBorder font-mono text-[11px] text-gray-300">React/Vite</span>
+<span class="px-2.5 py-1 rounded bg-[#061320] border border-gunmetalBorder font-mono text-[11px] text-gray-300">Node.js/Express</span>
+<span class="px-2.5 py-1 rounded bg-[#061320] border border-gunmetalBorder font-mono text-[11px] text-gray-300">FastAPI</span>
+<span class="px-2.5 py-1 rounded bg-[#061320] border border-gunmetalBorder font-mono text-[11px] text-gray-300">MongoDB</span>
+<span class="px-2.5 py-1 rounded bg-[#061320] border border-gunmetalBorder font-mono text-[11px] text-[#c98a45]">Docker</span>
+<span class="px-2.5 py-1 rounded bg-[#061320] border border-gunmetalBorder font-mono text-[11px] text-[#c98a45]">XGBoost</span>
+<span class="px-2.5 py-1 rounded bg-[#061320] border border-gunmetalBorder font-mono text-[11px] text-gray-300">LSTM</span>
+<span class="px-2.5 py-1 rounded bg-[#061320] border border-gunmetalBorder font-mono text-[11px] text-gray-300">JWT</span>
+</div>
+<!-- Architecture Details & Repo Action -->
+<div class="pt-5 border-t border-gunmetalBorder flex flex-wrap items-center justify-between gap-4">
+<div class="font-mono text-xs text-gray-400">
+<span class="">Pipeline: React/Vite → Express API gateway → FastAPI ML engine → MongoDB</span>
+</div>
+<a class="px-4 py-2 rounded bg-[#091522] hover:bg-[#c98a45] hover:text-black border border-[#c98a45]/40 font-mono text-xs font-semibold text-[#c98a45] transition-all flex items-center gap-1.5" href="https://github.com/karnbhosle/Financial_investment_planner.git" target="_blank">
+                VIEW REPOSITORY ↗
+              </a>
+</div>
+</div>
+<!-- PROJECT 02 (SECOND): AeroSense -->
+<div class="p-6 sm:p-8 rounded-xl bg-black/80 backdrop-blur-sm border border-cyanCore/40 hover:border-cyanCore transition-all shadow-[0_0_30px_rgba(97,232,255,0.06)]">
+<div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+<span class="font-mono text-xs text-cyanCore tracking-widest font-semibold">PROJECT_REF: AER-01</span>
+<span class="px-2.5 py-0.5 rounded bg-cyanCore/15 text-cyanCore font-mono text-[10px]">CPCB_COMPLIANT</span>
+</div>
+<h3 class="font-sans font-bold text-2xl text-white mb-1">AeroSense</h3>
+<p class="text-sm font-mono text-cyanCore mb-4">AI-Powered Air Quality Prediction &amp; Visualization System</p>
+<p class="text-gray-300 text-sm leading-relaxed mb-6">
+              A full-stack platform for predicting AQI and visualizing air-quality data across five major Indian metro cities.
+            </p>
+<ul class="space-y-2 mb-6 font-mono text-xs text-gray-300">
+<li class="flex items-start gap-2">
+<span class="text-cyanCore">•</span>
+<span class="">Random Forest-based AQI prediction using historical pollutant data.</span>
+</li>
+<li class="flex items-start gap-2">
+<span class="text-cyanCore">•</span>
+<span class="">AQI scores mapped to CPCB classification bands with health advisories.</span>
+</li>
+<li class="flex items-start gap-2">
+<span class="text-cyanCore">•</span>
+<span class="">City-wise predictions, historical trends, and pollutant analytics.</span>
+</li>
+</ul>
+<!-- Tech Chips -->
+<div class="flex flex-wrap gap-1.5 mb-6">
+<span class="px-2.5 py-1 rounded bg-[#061320] border border-gunmetalBorder font-mono text-[11px] text-cyanCore">Next.js</span>
+<span class="px-2.5 py-1 rounded bg-[#061320] border border-gunmetalBorder font-mono text-[11px] text-gray-300">React</span>
+<span class="px-2.5 py-1 rounded bg-[#061320] border border-gunmetalBorder font-mono text-[11px] text-gray-300">Tailwind CSS</span>
+<span class="px-2.5 py-1 rounded bg-[#061320] border border-gunmetalBorder font-mono text-[11px] text-gray-300">Express</span>
+<span class="px-2.5 py-1 rounded bg-[#061320] border border-gunmetalBorder font-mono text-[11px] text-gray-300">Flask</span>
+<span class="px-2.5 py-1 rounded bg-[#061320] border border-gunmetalBorder font-mono text-[11px] text-cyanCore">scikit-learn</span>
+<span class="px-2.5 py-1 rounded bg-[#061320] border border-gunmetalBorder font-mono text-[11px] text-gray-300">MongoDB</span>
+<span class="px-2.5 py-1 rounded bg-[#061320] border border-gunmetalBorder font-mono text-[11px] text-gray-300">Pandas</span>
+<span class="px-2.5 py-1 rounded bg-[#061320] border border-gunmetalBorder font-mono text-[11px] text-gray-300">Recharts</span>
+</div>
+<!-- Architecture Details & Repo Action -->
+<div class="pt-5 border-t border-gunmetalBorder flex flex-wrap items-center justify-between gap-4">
+<div class="font-mono text-xs text-gray-400">
+<span class="">Architecture: Next.js → Express API → Flask ML → MongoDB</span>
+</div>
+<a class="px-4 py-2 rounded bg-[#091522] hover:bg-cyanCore hover:text-black border border-cyanCore/40 font-mono text-xs font-semibold text-cyanCore transition-all flex items-center gap-1.5" href="https://github.com/karnbhosle/AeroSense.git" target="_blank">
+                VIEW REPOSITORY ↗
+              </a>
+</div>
+</div>
+</div>
+</section>
+<!-- ======================================================== -->
+<!-- 04. TECHNICAL SKILLS                                     -->
+<!-- ======================================================== -->
+<section class="py-20 border-b border-gunmetalBorder/60 scroll-mt-6" id="technical-skills">
+<div class="flex items-center space-x-3 mb-10">
+<span class="w-3 h-3 rounded-full bg-cyanCore animate-pulse"></span>
+<h2 class="font-sans font-bold text-2xl sm:text-3xl text-white tracking-tight uppercase">
+            04 / Technical Matrix &amp; Toolchain
+          </h2>
+</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+<!-- Languages -->
+<div class="p-5 rounded-lg bg-black/80 backdrop-blur-sm border border-gunmetalBorder">
+<div class="font-mono text-xs text-cyanCore font-bold uppercase mb-3 flex items-center gap-2">
+<span class="text-cyanCore">&lt;/&gt;</span> LANGUAGES
+            </div>
+<div class="flex flex-wrap gap-2">
+<span class="px-2.5 py-1 rounded bg-[#061019] text-xs font-mono text-gray-200">Java</span>
+<span class="px-2.5 py-1 rounded bg-[#061019] text-xs font-mono text-gray-200">Python</span>
+<span class="px-2.5 py-1 rounded bg-[#061019] text-xs font-mono text-gray-200">C++</span>
+<span class="px-2.5 py-1 rounded bg-[#061019] text-xs font-mono text-gray-200">C</span>
+</div>
+</div>
+<!-- Frontend -->
+<div class="p-5 rounded-lg bg-black/80 backdrop-blur-sm border border-gunmetalBorder">
+<div class="font-mono text-xs text-cyanCore font-bold uppercase mb-3 flex items-center gap-2">
+<span class="text-cyanCore">❖</span> FRONTEND
+            </div>
+<div class="flex flex-wrap gap-2">
+<span class="px-2.5 py-1 rounded bg-[#061019] text-xs font-mono text-gray-200">React.js</span>
+<span class="px-2.5 py-1 rounded bg-[#061019] text-xs font-mono text-gray-200">Next.js</span>
+<span class="px-2.5 py-1 rounded bg-[#061019] text-xs font-mono text-gray-200">JavaScript</span>
+<span class="px-2.5 py-1 rounded bg-[#061019] text-xs font-mono text-gray-200">Tailwind CSS</span>
+</div>
+</div>
+<!-- Backend -->
+<div class="p-5 rounded-lg bg-black/80 backdrop-blur-sm border border-gunmetalBorder">
+<div class="font-mono text-xs text-cyanCore font-bold uppercase mb-3 flex items-center gap-2">
+<span class="text-cyanCore">⚙</span> BACKEND
+            </div>
+<div class="flex flex-wrap gap-2">
+<span class="px-2.5 py-1 rounded bg-[#061019] text-xs font-mono text-gray-200">Node.js</span>
+<span class="px-2.5 py-1 rounded bg-[#061019] text-xs font-mono text-gray-200">Express.js</span>
+<span class="px-2.5 py-1 rounded bg-[#061019] text-xs font-mono text-gray-200">FastAPI</span>
+<span class="px-2.5 py-1 rounded bg-[#061019] text-xs font-mono text-gray-200">Flask</span>
+<span class="px-2.5 py-1 rounded bg-[#061019] text-xs font-mono text-gray-200">Socket.io</span>
+</div>
+</div>
+<!-- Databases -->
+<div class="p-5 rounded-lg bg-black/80 backdrop-blur-sm border border-gunmetalBorder">
+<div class="font-mono text-xs text-cyanCore font-bold uppercase mb-3 flex items-center gap-2">
+<span class="text-cyanCore">⛁</span> DATABASES
+            </div>
+<div class="flex flex-wrap gap-2">
+<span class="px-2.5 py-1 rounded bg-[#061019] text-xs font-mono text-gray-200">MongoDB</span>
+<span class="px-2.5 py-1 rounded bg-[#061019] text-xs font-mono text-gray-200">NoSQL</span>
+<span class="px-2.5 py-1 rounded bg-[#061019] text-xs font-mono text-gray-200">RDBMS</span>
+</div>
+</div>
+<!-- Machine Learning -->
+<div class="p-5 rounded-lg bg-black/80 backdrop-blur-sm border border-gunmetalBorder">
+<div class="font-mono text-xs text-cyanCore font-bold uppercase mb-3 flex items-center gap-2">
+<span class="text-cyanCore">☊</span> MACHINE LEARNING
+            </div>
+<div class="flex flex-wrap gap-2">
+<span class="px-2.5 py-1 rounded bg-[#061019] text-xs font-mono text-gray-200">Scikit-learn</span>
+<span class="px-2.5 py-1 rounded bg-[#061019] text-xs font-mono text-gray-200">XGBoost</span>
+<span class="px-2.5 py-1 rounded bg-[#061019] text-xs font-mono text-gray-200">LSTM</span>
+<span class="px-2.5 py-1 rounded bg-[#061019] text-xs font-mono text-gray-200">NumPy</span>
+<span class="px-2.5 py-1 rounded bg-[#061019] text-xs font-mono text-gray-200">Pandas</span>
+</div>
+</div>
+<!-- Concepts & Tools -->
+<div class="p-5 rounded-lg bg-black/80 backdrop-blur-sm border border-gunmetalBorder">
+<div class="font-mono text-xs text-cyanCore font-bold uppercase mb-3 flex items-center gap-2">
+<span class="text-cyanCore">🛠</span> CONCEPTS &amp; TOOLS
+            </div>
+<div class="flex flex-wrap gap-2">
+<span class="px-2.5 py-1 rounded bg-[#061019] text-xs font-mono text-gray-200">System Design</span>
+<span class="px-2.5 py-1 rounded bg-[#061019] text-xs font-mono text-gray-200">API Design</span>
+<span class="px-2.5 py-1 rounded bg-[#061019] text-xs font-mono text-gray-200">Docker</span>
+<span class="px-2.5 py-1 rounded bg-[#061019] text-xs font-mono text-gray-200">Git</span>
+<span class="px-2.5 py-1 rounded bg-[#061019] text-xs font-mono text-gray-200">JWT</span>
+</div>
+</div>
+</div>
+</section>
+<!-- ======================================================== -->
+<!-- 05. CO-CURRICULAR ACTIVITIES                             -->
+<!-- ======================================================== -->
+<section class="py-20 border-b border-gunmetalBorder/60 scroll-mt-6" id="activities">
+<div class="flex items-center space-x-3 mb-10">
+<span class="w-3 h-3 rounded-full bg-cyanCore animate-pulse"></span>
+<h2 class="font-sans font-bold text-2xl sm:text-3xl text-white tracking-tight uppercase">
+            05 / Co-Curricular &amp; Leadership
+          </h2>
+</div>
+<!-- GROUP A: HACKATHONS & ACHIEVEMENTS -->
+<div class="mb-10">
+<div class="font-mono text-xs text-cyanCore font-semibold tracking-wider uppercase mb-4">• GROUP A: HACKATHONS &amp; ACHIEVEMENTS</div>
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+<!-- KJ Somaiya -->
+<div class="p-5 rounded-lg bg-black/80 backdrop-blur-sm border border-[#c98a45]/60 hover:border-[#c98a45] transition-all">
+<div class="flex items-center justify-between mb-2">
+<span class="font-sans font-bold text-white text-base">KJ Somaiya Code Icon Hackathon</span>
+<span class="px-2 py-0.5 rounded bg-[#c98a45]/20 text-[#c98a45] font-mono text-xs font-bold">2ND PLACE</span>
+</div>
+<div class="p-3 mt-3 rounded border border-dashed border-gray-800 text-center font-mono text-xs text-gray-400">
+                [ Certificate to be added ]
+              </div>
+</div>
+<!-- Odoo Finale -->
+<div class="p-5 rounded-lg bg-black/80 backdrop-blur-sm border border-gunmetalBorder hover:border-cyanCore/40 transition-all">
+<div class="flex items-center justify-between mb-2">
+<span class="font-sans font-bold text-white text-base">Odoo Finale Hackathon</span>
+<span class="font-mono text-xs text-gray-400">Gandhinagar</span>
+</div>
+<div class="p-3 mt-3 rounded border border-dashed border-gray-800 text-center font-mono text-xs text-gray-400">
+                [ Certificate to be added ]
+              </div>
+</div>
+</div>
+</div>
+<!-- GROUP B: EXTRA-CURRICULAR & LEADERSHIP -->
+<div>
+<div class="font-mono text-xs text-cyanCore font-semibold tracking-wider uppercase mb-4">• GROUP B: EXTRA-CURRICULAR &amp; LEADERSHIP</div>
+<div class="p-6 rounded-lg bg-black/80 backdrop-blur-sm border border-gunmetalBorder">
+<div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+<h3 class="font-sans font-bold text-lg text-white">Pixels TechFest 2026</h3>
+<span class="px-2 py-0.5 rounded bg-cyanCore/10 text-cyanCore font-mono text-xs">STUDENT COUNCIL</span>
+</div>
+<p class="text-xs font-mono text-gray-400 mb-3">SIES College of Management Studies (SIESCOMS), Nerul</p>
+<p class="text-xs font-mono text-cyanCore mb-3">Role: MCA Department Student Council Member and Technical Team member</p>
+<p class="text-gray-300 text-sm leading-relaxed">
+              "Contributed to planning and executing Pixels TechFest, collaborating with faculty, student committees, and participants. Supported technical and non-technical events, event coordination, participant management, logistics, promotions, and on-site operations."
+            </p>
+</div>
+</div>
+</section>
+<!-- ======================================================== -->
+<!-- 06. CONTACT CONSOLE                                      -->
+<!-- ======================================================== -->
+<section class="py-20 scroll-mt-6" id="contact">
+<div class="flex items-center space-x-3 mb-6">
+<span class="w-3 h-3 rounded-full bg-cyanCore animate-pulse"></span>
+<h2 class="font-sans font-bold text-2xl sm:text-3xl text-white tracking-tight uppercase">
+            06 / Contact Console
+          </h2>
+</div>
+<p class="text-xl text-cyanCore font-sans font-medium mb-10">
+          Let's build something meaningful.
+        </p>
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
+<!-- Channels -->
+<div class="space-y-4">
+<a class="p-4 rounded-lg bg-black/80 backdrop-blur-sm border border-cyanCore/40 hover:border-cyanCore block transition-all group" href="mailto:karnabhosle223@gmail.com">
+<span class="font-mono text-[10px] text-gray-400 uppercase tracking-widest block mb-1">PRIMARY TRANSMISSION CHANNEL</span>
+<span class="font-mono text-sm sm:text-base text-white group-hover:text-cyanCore transition-colors font-semibold">karnabhosle223@gmail.com</span>
+</a>
+<a class="p-4 rounded-lg bg-black/80 backdrop-blur-sm border border-gunmetalBorder hover:border-cyanCore block transition-all group" href="tel:+919076070482">
+<span class="font-mono text-[10px] text-gray-400 uppercase tracking-widest block mb-1">VOICE &amp; TELEMETRY</span>
+<span class="font-mono text-sm sm:text-base text-white group-hover:text-cyanCore transition-colors font-semibold">+91 9076070482</span>
+</a>
+<div class="p-4 rounded-lg bg-black/80 backdrop-blur-sm border border-gunmetalBorder">
+<span class="font-mono text-[10px] text-gray-400 uppercase tracking-widest block mb-1">BASE COORDINATES</span>
+<span class="font-mono text-sm text-gray-300">Ghatkopar (West), Mumbai</span>
+</div>
+<p class="font-mono text-[11px] text-gray-500 pt-4">
+              "Your details will only be used to respond to your enquiry."
+            </p>
+</div>
+<!-- Dispatch Message Form -->
+<form class="p-6 rounded-xl bg-black/80 backdrop-blur-sm border border-gunmetalBorder space-y-4" onsubmit="event.preventDefault(); alert('Transmission simulated: message received in UI state specification.');">
+<div>
+<label class="font-mono text-xs text-gray-300 block mb-1">NAME *</label>
+<input class="w-full px-3.5 py-2.5 rounded bg-[#061019] border border-gunmetalBorder focus:border-cyanCore focus:outline-none text-white font-mono text-xs" placeholder="e.g. Maya Chen" required="" type="text"/>
+</div>
+<div>
+<label class="font-mono text-xs text-gray-300 block mb-1">EMAIL ADDRESS *</label>
+<input class="w-full px-3.5 py-2.5 rounded bg-[#061019] border border-gunmetalBorder focus:border-cyanCore focus:outline-none text-white font-mono text-xs" placeholder="name@domain.com" required="" type="email"/>
+</div>
+<div>
+<label class="font-mono text-xs text-gray-300 block mb-1">SUBJECT</label>
+<input class="w-full px-3.5 py-2.5 rounded bg-[#061019] border border-gunmetalBorder focus:border-cyanCore focus:outline-none text-white font-mono text-xs" placeholder="Engineering Discussion / SDE Role" type="text"/>
+</div>
+<div>
+<label class="font-mono text-xs text-gray-300 block mb-1">MESSAGE *</label>
+<textarea class="w-full px-3.5 py-2.5 rounded bg-[#061019] border border-gunmetalBorder focus:border-cyanCore focus:outline-none text-white font-mono text-xs" placeholder="Type your inquiry or project details here..." required="" rows="4"></textarea>
+</div>
+<button class="w-full py-3 rounded bg-cyanCore hover:bg-white text-black font-mono text-xs font-bold tracking-wider uppercase transition-all shadow-[0_0_15px_rgba(97,232,255,0.3)]" type="submit">
+              SEND MESSAGE ↗
+            </button>
+</form>
+</div>
+<!-- Footer -->
+<footer class="mt-20 pt-8 border-t border-gunmetalBorder flex flex-col sm:flex-row items-center justify-between text-xs font-mono text-gray-400 gap-4">
+<div class="">Karna Bhosle • <span class="text-cyanCore">[KB] CORE</span></div>
+<a class="hover:text-cyanCore transition-colors flex items-center gap-1" href="#know-karna">
+            Back to top ↑
+          </a>
+</footer>
+</section>
+</main>
+</div>
+</body></html>

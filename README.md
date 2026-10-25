@@ -1,10 +1,10 @@
 # KARNA / CORE
 
-Karna Bhosle's reactor-inspired, single-page portfolio. The six anchored sections introduce Karna, his qualifications, AeroSense and CorpusAI, his exact CV skills, activities, and contact details. The visual design and original reactor/project SVG geometry came from Stitch MCP; see [design provenance](design/README.md).
+Karna Bhosle's single-page portfolio. A first visit opens on an arc reactor: press the core, it charges with the repulsor sound and discharges into the portfolio. Six anchored sections follow: Know Karna, Qualifications, Projects, Tech matrix, Leadership & awards and Contact. Every fact on the page comes from Karna's CV through one typed content file; the API, the page and the structured data all read it.
 
 ## Run locally
 
-Requires Node.js **22.12+** (tested on 24.12), npm, and MongoDB 8 or a MongoDB Atlas connection. Docker Desktop is optional. Run from the repository root:
+Requires Node.js **22.12+** (tested on 24.12), npm, and MongoDB 8 or a MongoDB Atlas connection. Docker Desktop is optional. From the repository root:
 
 ```powershell
 npm ci
@@ -15,23 +15,33 @@ npm run seed
 npm run dev
 ```
 
-Start Docker Desktop before the Compose command. Open **http://localhost:3000**; Express listens at **http://localhost:4000**. `npm run dev` builds and watches shared content, Next.js and Express together. Stop with Ctrl+C. Local MongoDB data persists in the `karna_mongo` Docker volume. `docker compose down` stops it while retaining that volume.
+Open **http://localhost:3000**; Express listens at **http://localhost:4000**. `npm run dev` builds and watches the shared package, Next.js and Express together. Stop with Ctrl+C. `docker compose down` stops MongoDB and keeps its `karna_mongo` volume.
 
-Without Docker, run a local MongoDB Community server and set `MONGODB_URI` to its database, or use an Atlas database with a dedicated database user and the correct network access rules. Do not point tests at the live portfolio database. If you only need to preview the page, run `npm run dev:web`: no API, database, SMTP or credentials are needed for rendering or building. Without database persistence, the form fails honestly and offers direct email.
+To preview only the page, run `npm run dev:web`: no API, database, SMTP or credentials are needed to render or build it. Content then comes from the shared seed, and the contact form reports honestly that it cannot save.
+
+**After changing content, run `npm run seed` again.** The API serves the stored database copy, so an older seed in MongoDB keeps showing old content until it is replaced.
 
 ## Architecture
 
 ```text
-apps/web          Next.js App Router / React / Tailwind / Motion
-apps/api          Separate Express process / Mongoose / Nodemailer
-packages/shared   Strict Zod schemas, public types, canonical seed
-tests/e2e         Playwright browser and axe accessibility checks
-design/stitch     Unserved Stitch reference exports
+apps/web          Next.js 16 App Router, React 19, Tailwind CSS 3
+apps/api          Express 5, Mongoose 9, Nodemailer
+packages/shared   Zod schemas, public types and the canonical content seed
+tests/e2e         Playwright browser and axe accessibility tests
+tests/helpers     capture.mjs: screenshots of the running site for visual review
+design/, resources/  Stitch design references (not served)
 ```
 
-Most page content is rendered by Server Components. Small client components manage navigation, motion, dialogs and the form. Next.js does not implement API routes for contact, database access or email. Its server fetches the allowlisted portfolio endpoint with a 1.8-second timeout and a 60-second cache; a failed fetch or invalid response uses the typed canonical seed. A frontend build never requires MongoDB. Browser form requests go directly to Express and have a 30-second timeout; uncertain network receipt does not reset the form or imply success.
+The page is a statically generated Server Component, revalidated every 60 seconds. Its server fetches `GET /api/portfolio` with a 1.8-second timeout and falls back to the typed seed, so a build never needs MongoDB and the site stays up when the API is down. Small client components handle the intro, navigation state, the mobile menu, motion and sound preferences, the skill filter, the AQI band explorer and the contact form.
 
-Motion is optional, keyboard controllable, persisted locally when storage works, and initially respects `prefers-reduced-motion`. Decorative CSS loops pause outside the viewport and when the tab is hidden. Short Motion reveals leave server-rendered text visible before initialization, and static SVGs remain available without JavaScript. The page uses native vertical scrolling and anchors.
+### Frontend behaviour
+
+- **Ignition intro.** Shown once per browser session, skipped for direct section links (`/#projects`) and for crawlers. "Skip intro", Escape, and "Replay intro" in the navigation all work. The page underneath is fully rendered and inert while the intro is up. With JavaScript off, the intro never appears.
+- **Motion.** A pre-paint script applies the stored choice, or the OS reduced-motion setting, before anything renders. "Pause motion" stops every decorative loop and is remembered. Reduced motion replaces the ignition with a short cross-fade with no flash. Decorative loops pause while the tab is hidden, and the background reactor holds still on phones.
+- **Layout.** Desktop gets a fixed section rail; below 1024px a sticky top bar shows the current section and opens a full-screen menu (a native `<dialog>` with focus return). Layouts are verified at 320, 360, 768 and 1440px and at 200% zoom.
+- **Projects.** Each project shows its highlights, a responsive service-topology diagram, its processing pipeline, its stack and expandable implementation notes. AeroSense includes an interactive scale of India's CPCB AQI bands; it describes the public standard, not project measurements.
+- **Tech matrix.** Every CV skill, grouped as on the CV. Choosing a project highlights the skills its stack uses.
+- **Contact.** Client-side validation with the shared schema, inline errors linked to their fields, a saved draft that survives a reload, a honeypot, and honest outcomes for every response: saved (with the real email status), not saved, rate-limited (with the wait time) and unconfirmed. Each message carries an `Idempotency-Key`, so retrying after an unconfirmed send can never save it twice.
 
 ## Environment
 
@@ -47,47 +57,45 @@ Copy the examples as shown above; real `.env` files are ignored. No secrets belo
 | `SMTP_USER`, `SMTP_PASS` | Express | Provider credentials; optional for a trusted local relay. |
 | `SMTP_FROM` | Express | Fixed provider-approved sender address. |
 | `SMTP_TO` | Express | Fixed recipient; defaults to `karnabhosle223@gmail.com`. |
-| `API_BASE_URL` | Next.js server | Internal address of Express for public content fetching. |
-| `NEXT_PUBLIC_API_BASE_URL` | Browser | Publicly reachable Express origin; baked into the frontend build. |
-| `SITE_URL` | Next.js server/build | Real public site origin. Leave blank locally; no example canonical or Person identity URL is emitted. |
+| `NOTIFY_RETRY_INTERVAL_MS` | Express | How often failed notifications are retried; default 5 minutes, `0` disables. |
+| `NOTIFY_MAX_ATTEMPTS` | Express | SMTP attempts per message, default 5. |
+| `API_BASE_URL` | Next.js server | Internal address of Express for content fetching. |
+| `NEXT_PUBLIC_API_BASE_URL` | Browser | Public Express origin for the contact form, also added to the Content-Security-Policy. Baked in at build time; a production build without it tells visitors to email directly. |
+| `SITE_URL` | Next.js server/build | Real public origin. Enables the canonical URL, sitemap entry and Person `url`. Leave blank locally. |
 
-For SMTP, obtain a provider's SMTP host, port and credentials, approve the sender as required by that provider, and populate the API environment. The visitor only controls a validated Reply-To address and plain-text body content. They cannot select the recipient, sender or raw email headers. There is no marketing signup or tracking. A real external test email has not been sent.
+## API
 
-## API and contact truthfulness
-
-| Endpoint | Behavior |
+| Endpoint | Behaviour |
 | --- | --- |
-| `GET /api/health` | Public, secret-free database/email configuration status; 503 when the database is unavailable. |
-| `GET /api/portfolio` | Strict allowlisted portfolio content; database content or canonical seed fallback. |
-| `POST /api/contact` | Validated name, email, subject, message and optional empty `website` honeypot. |
+| `GET /api/health/live` | Liveness: 200 whenever the process is serving. |
+| `GET /api/health` | Readiness: database and email configuration status; 503 while the database is unavailable. |
+| `GET /api/portfolio` | Strict allowlisted content: the database copy when valid, else the canonical seed. Fields added since older content was stored get their defaults. |
+| `POST /api/contact` | Validated name, email, subject, message and empty `website` honeypot. Optional `Idempotency-Key` header. |
 
-HTTP 201 is returned **only after MongoDB saves the message**. SMTP is attempted afterward and its status is persisted as `pending`, `accepted`, `failed` or `not_configured`. SMTP acceptance does not prove inbox delivery. Failure or absent email configuration leaves the message saved and recommends direct email for urgent enquiries. Database failure returns 503 and never claims success. The browser retains the visitor's text on failure and prevents duplicate pending submissions. Network loss after saving may leave receipt uncertain; use direct email before retrying because there is no idempotency or background mail retry system.
+HTTP 201 is returned **only after MongoDB saves the message**. SMTP is attempted afterwards and its outcome is stored as `pending`, `accepted`, `failed` or `not_configured`; acceptance never claims inbox delivery. A retry with the same `Idempotency-Key` returns the original receipt with `replayed: true` and HTTP 200, without saving or emailing again; reusing a key for a different message returns 409. Failed notifications are retried in the background with backoff (5, 15, 45 and 135 minutes) up to the attempt limit. Claims are atomic, so several API instances never send the same retry twice.
 
-The API includes Helmet, explicit CORS origins, strict shared schemas, length limits, a 32 KB JSON limit, a honeypot and five contact attempts per IP per 15 minutes. The memory rate-limit store is suitable for **one API instance**; replace it with a shared store before horizontal scaling. CORS is not an authentication or bot prevention system. Configure proxy trust only for a controlled proxy that sanitizes forwarding headers. Expose the API over HTTPS in deployment. Logs contain event codes, not enquiry bodies or credentials. Contact data has timestamps and notification indexes; there are no public message listing, content editing or admin endpoints. See [API operational details](apps/api/README.md).
+Every response carries an `X-Request-Id`, and server logs are JSON lines with event codes and request IDs, never enquiry text, addresses or credentials. The API also has Helmet, explicit CORS origins, a 32 KB body limit, strict shared schemas, the honeypot and five contact attempts per IP per 15 minutes. The in-memory rate-limit store suits **one API instance**; use a shared store before scaling out. See [API operational details](apps/api/README.md).
 
 ## Content and assets
 
-Edit only `packages/shared/src/seed.ts` to update content, rebuild, and run `npm run seed` against the intended database. The seed is idempotent and upserts the `main` content document. **It overwrites database portfolio content from the canonical seed**, so add approved asset references to that seed before reseeding. It does not delete contact messages.
+Edit only `packages/shared/src/seed.ts`, rebuild, and run `npm run seed` against the intended database. The seed is idempotent and **overwrites** the stored `main` content document; it never touches contact messages.
 
-All displayed skills and project descriptions come from Karna's CV and accompanying instructions. Repositories were not audited. Grades, grades-derived claims, unverified outcomes, unprovided social accounts and invented metrics are excluded from public schemas, content, metadata and API responses. Odoo's result, date and designation remain null.
+Skills and project descriptions come from Karna's CV and accompanying instructions; the repositories were not audited. Grades, invented metrics, unverified outcomes and unprovided social accounts are excluded from schemas, content, metadata and API responses. The GitHub profile link is the account that owns both project repositories. Each project's `pipeline` lists its processing stages with only CV-backed detail. CorpusAI's model-to-stage mapping (XGBoost for risk classification, the dual-head LSTM for net-worth forecasting, K-Means and Isolation Forest for peer grouping and anomalies) follows the previous page copy; confirm it before publishing.
 
-Asset locations:
-
-```text
-apps/web/public/images/projects/
-apps/web/public/images/certificates/
-apps/web/public/resume/
-```
-
-Optional project `screenshot`, activity/training `certificate`, and profile `publicResume` fields default to `null`. Image assets use one strict schema:
+Optional assets use one strict shape and default to `null`:
 
 ```ts
-{ path: '/images/certificates/code-icon.jpg', alt: 'Accurate description of the supplied certificate', width: 1600, height: 1100 }
+{ path: '/images/certificates/code-icon.jpg', alt: 'Accurate description of the certificate', width: 1600, height: 1100 }
 ```
 
-The dimensions above illustrate the shape; replace them with the **actual file dimensions**. Add the approved KJ Somaiya image to the certificates directory and update `activities.achievements` record `code-icon`. Use `odoo-finale` for the Odoo image. Supply meaningful alt text and preserve the full image. Reseed/rebuild; layout components need no changes. Without an image, only “Certificate to be added” is shown. With an image, a native modal dialog supports keyboard focus containment, Escape, close and focus restoration. Project screenshots use the same asset shape and reserved dimensions; current abstract artwork is explicitly labeled illustrative.
+| Field | Effect when set |
+| --- | --- |
+| `profile.portrait` | A photo at the top of the Profile panel. |
+| `projects[].screenshot` | A screenshot under the project summary. |
+| `training[].certificate`, `activities.achievements[].certificate` | A "View certificate" button opening an accessible dialog. |
+| `profile.publicResume` | Reserved; leave `null` until a grade-free resume is approved. |
 
-Do not publish the supplied original CV: it contains grades. Leave `profile.publicResume=null` until Karna supplies a grade-free or explicitly approved file. The existing local CV was not copied here. A portrait, live demos and certificates are unnecessary for running the application.
+Put files in `apps/web/public/images/projects/`, `apps/web/public/images/certificates/` or `apps/web/public/resume/`, use their **real** dimensions, then reseed and rebuild. Do not publish the original CV: it contains grades.
 
 ## Commands and verification
 
@@ -101,17 +109,20 @@ npm run build
 npm start
 ```
 
-`npm test` uses isolated repository doubles and mocked SMTP for validation, saved/failing persistence responses, mail outcomes, malformed requests, public allowlisting, rate limiting and configuration. `npm run test:integration` uses a temporary real MongoDB process and separate `karna_api_isolated_test` database for Mongoose records, status updates, timestamps, indexes and idempotent seeding. It never reads the live database URI. On the first integration run, `mongodb-memory-server-core` may download a compatible MongoDB test binary. For an installed executable, set `MONGOMS_SYSTEM_BINARY` to its full path. SMTP is always mocked in tests.
+- `npm test`: request, idempotency, logging, retry-worker, notification and configuration tests with repository doubles and mocked SMTP.
+- `npm run test:integration`: real Mongoose against a temporary MongoDB, covering records, attempt counting, idempotency indexes, atomic retry claims and seeding. It never reads the live database URI. The first run may download a MongoDB test binary; set `MONGOMS_SYSTEM_BINARY` to use an installed one.
+- `npm run test:e2e`: starts the frontend and checks the intro, anchors and navigation, the mobile menu, motion and sound preferences, the skill filter, the AQI scale, the 404 page, no-JavaScript rendering, every contact-form outcome including idempotent retries, overflow at 320–1440px and 200% zoom, and axe WCAG 2.2 AA scans. Install the browser once if needed: `npx playwright install chromium`.
+- `node tests/helpers/capture.mjs http://localhost:3000 360,768,1440`: screenshots for visual review in `test-results/capture`.
 
-Browser tests start the frontend automatically and exercise anchors, active navigation, the mobile menu, form validation/pending/failure/saved states, reduced motion, JavaScript-disabled rendering, no overflow, and axe scans at 360, 768 and 1440 pixels. Contact responses are intercepted in those browser tests; real persistence is covered separately. Install the matching browser once if needed: `npx playwright install chromium`. Browser reports and screenshots are local ignored artifacts. See [verification results](VERIFICATION.md) for checks actually run; no Lighthouse score is claimed.
+See [verification results](VERIFICATION.md) for the checks actually run. No Lighthouse score is claimed.
 
 ## Production deployment
 
-1. Provision a private MongoDB database with a dedicated least-privilege application user. Configure backups and a contact-data retention/deletion process appropriate to your use.
-2. Deploy `apps/api` as a separate long-running Node service. Install from the root lockfile with `npm ci`, build shared and API workspaces, and start `npm run start -w @karna/api`. Configure private database/SMTP variables, deliberate host/proxy settings and allowed frontend origin. Termination signals trigger graceful shutdown.
-3. Deploy `apps/web` on a Next.js-compatible host with the monorepo root as install context. Build shared first, then `npm run build -w @karna/web`; start `npm run start -w @karna/web` where required. Set internal `API_BASE_URL`, public HTTPS `NEXT_PUBLIC_API_BASE_URL`, and the real `SITE_URL` **before building**. Do not bake localhost into a public build. Public metadata includes an original KB favicon and generated social-preview image, with no example canonical domain.
-4. Seed the intended database from the same canonical content version. Confirm health, content and one authorized real submission after SMTP configuration; verify the saved record and SMTP state without equating acceptance with inbox delivery.
+1. Provision a private MongoDB with a least-privilege application user, backups, and a retention process for contact messages.
+2. Deploy `apps/api` as a long-running Node service: `npm ci` from the root lockfile, build shared and API, then `npm run start -w @karna/api`. Configure database, SMTP, `ALLOWED_ORIGINS` and proxy trust deliberately, and expose it over HTTPS. Point liveness checks at `/api/health/live` and readiness at `/api/health`.
+3. Deploy `apps/web` on a Next.js host with the monorepo root as install context. Set `API_BASE_URL`, the public HTTPS `NEXT_PUBLIC_API_BASE_URL` and the real `SITE_URL` **before building**. Production builds send a Content-Security-Policy, HSTS, `X-Frame-Options: DENY` and related headers.
+4. Seed the database from the same content version. Confirm health, content and one authorized real submission, and check the stored notification status.
 
-No hosting account, domain or personal asset has been published. Remaining inputs are production database/hosting configuration, a working SMTP sender/provider, a real site URL and any future approved resume, certificates or screenshots.
+No hosting account, domain or personal asset has been published. Remaining inputs are production hosting, an SMTP provider, a real site URL, and any approved portrait, certificates or screenshots. The intro sound (`apps/web/public/audio/repulsor.mp3`) is a film sound effect clip; confirm you have the right to use it publicly or swap in a licensed sound.
 
-The lockfile pins published compatible dependency versions. ESLint 9 is pinned because the current Next.js React lint plugin fails with ESLint 10; this compatibility choice is documented instead of suppressing the crash.
+ESLint 9 is pinned because the current Next.js React lint plugin fails with ESLint 10.

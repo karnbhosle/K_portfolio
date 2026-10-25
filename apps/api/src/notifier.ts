@@ -4,20 +4,28 @@ import type { ContactNotifier, StoredContact } from './contracts.js';
 
 type MailSender = { sendMail: (message: object) => Promise<{ accepted?: unknown[] }> };
 
+/** Header values never carry line breaks or control characters, whatever reached storage. */
+function headerSafe(value: string, max: number): string {
+  return value.replace(/[\u0000-\u001f\u007f]+/g, ' ').replace(/\s+/g, ' ').trim().slice(0, max);
+}
+
 export function buildNotification(contact: StoredContact, config: AppConfig['smtp']) {
   return {
     from: config.from,
     to: config.to,
     replyTo: contact.email,
-    subject: 'New enquiry from KARNA / CORE',
+    subject: `Portfolio enquiry: ${headerSafe(contact.subject, 150)}`,
     text: [
-      'A visitor submitted a portfolio enquiry.',
+      'A visitor sent an enquiry through your portfolio.',
       '',
-      `Name: ${contact.name}`,
-      `Email: ${contact.email}`,
-      `Subject: ${contact.subject}`,
+      `Name: ${headerSafe(contact.name, 100)}`,
+      `Email: ${headerSafe(contact.email, 254)}`,
+      `Subject: ${headerSafe(contact.subject, 150)}`,
       '',
       contact.message,
+      '',
+      '--',
+      'Reply to this email to answer the visitor directly.',
     ].join('\n'),
     disableFileAccess: true,
     disableUrlAccess: true,

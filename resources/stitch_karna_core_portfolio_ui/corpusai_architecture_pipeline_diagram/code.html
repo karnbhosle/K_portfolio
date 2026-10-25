@@ -1,0 +1,300 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 940 380" width="100%" height="100%" style="background:#050a10; font-family:'JetBrains Mono', 'Space Grotesk', monospace; border-radius: 8px;">
+  <defs>
+    <!-- Background Grid Pattern -->
+    <pattern id="grid-corpus-v2" width="20" height="20" patternUnits="userSpaceOnUse">
+      <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#162536" stroke-width="0.7" opacity="0.5"/>
+    </pattern>
+
+    <!-- Gradients -->
+    <linearGradient id="corp-gold-grad" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#734107" stop-opacity="0.3"/>
+      <stop offset="50%" stop-color="#C98A45" stop-opacity="0.9"/>
+      <stop offset="100%" stop-color="#FFE0B2" stop-opacity="1"/>
+    </linearGradient>
+
+    <linearGradient id="corp-area-grad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#C98A45" stop-opacity="0.25"/>
+      <stop offset="100%" stop-color="#C98A45" stop-opacity="0.0"/>
+    </linearGradient>
+
+    <linearGradient id="corp-cyan-draw" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#61E8FF" stop-opacity="0.95"/>
+      <stop offset="100%" stop-color="#006774" stop-opacity="0.3"/>
+    </linearGradient>
+
+    <filter id="corp-glow-copper" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <filter id="corp-glow-cyan" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="2.5" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Frame Background -->
+  <rect width="100%" height="100%" fill="#04090F"/>
+  <rect width="100%" height="100%" fill="url(#grid-corpus-v2)"/>
+  <rect x="0.5" y="0.5" width="939" height="379" rx="7.5" fill="none" stroke="#1D2E42" stroke-width="1"/>
+
+  <!-- Top System Header Telemetry Bar -->
+  <rect x="1" y="1" width="938" height="34" fill="#08131E"/>
+  <line x1="1" y1="35" x2="939" y2="35" stroke="#1D2E42" stroke-width="1"/>
+  
+  <rect x="14" y="9" width="7" height="16" fill="#C98A45"/>
+  <text x="28" y="21" fill="#FFD6A5" font-size="11" font-weight="700" letter-spacing="1">PROJECT: CORPUS-AI // FINANCIAL LIFECYCLE SIMULATION &amp; ML ORCHESTRATION</text>
+  
+  <rect x="635" y="8" width="135" height="18" rx="3" fill="#101F2D" stroke="#253C52" stroke-width="0.8"/>
+  <text x="643" y="21" fill="#61E8FF" font-size="9.5" font-weight="600">DOCKER COMPOSE // 4-TIER</text>
+  <text x="785" y="21" fill="#8499AA" font-size="9.5">RUNTIME: 12ms // STABLE</text>
+
+  <!-- Corner Brackets -->
+  <path d="M 6 6 L 14 6 M 6 6 L 6 14" stroke="#C98A45" stroke-width="1.5" fill="none"/>
+  <path d="M 934 6 L 926 6 M 934 6 L 934 14" stroke="#C98A45" stroke-width="1.5" fill="none"/>
+  <path d="M 6 374 L 14 374 M 6 374 L 6 366" stroke="#C98A45" stroke-width="1.5" fill="none"/>
+  <path d="M 934 374 L 926 374 M 934 374 L 934 366" stroke="#C98A45" stroke-width="1.5" fill="none"/>
+
+  <!-- LEFT PANEL: 4-CONTAINER MICROSERVICE ARCHITECTURE FLOW (x: 16 -> 475) -->
+  <g transform="translate(16, 44)">
+    <!-- Sub-header -->
+    <rect width="455" height="24" rx="4" fill="#0A1624" stroke="#1D2E42" stroke-width="1"/>
+    <text x="10" y="16" fill="#61E8FF" font-size="9.5" font-weight="700" letter-spacing="0.5">CONTAINERIZED ARCHITECTURE &amp; DATA CONTRACT</text>
+    <text x="345" y="16" fill="#8499AA" font-size="8.5">JWT AUTH GUARDED</text>
+
+    <!-- Node 1: Client Layer -->
+    <g transform="translate(0, 32)">
+      <rect width="100" height="74" rx="4" fill="#0C1826" stroke="#61E8FF" stroke-width="1.2"/>
+      <rect x="0" y="0" width="100" height="16" rx="4" fill="#132A40"/>
+      <text x="8" y="12" fill="#61E8FF" font-size="8.5" font-weight="700">01 // CLIENT</text>
+      <text x="8" y="32" fill="#FFFFFF" font-size="11" font-weight="700">React + Vite</text>
+      <text x="8" y="46" fill="#8499AA" font-size="8">Tailwind UI + Hooks</text>
+      <text x="8" y="58" fill="#8499AA" font-size="8">Interactive Sliders</text>
+      <text x="8" y="68" fill="#61E8FF" font-size="7.5">PORT: 5173</text>
+    </g>
+
+    <!-- Arrow 1 -> 2 -->
+    <path d="M 100 69 L 116 69" stroke="#61E8FF" stroke-width="1.5" fill="none"/>
+    <polygon points="116,66 122,69 116,72" fill="#61E8FF"/>
+    <text x="102" y="62" fill="#8499AA" font-size="7">HTTP/JSON</text>
+
+    <!-- Node 2: Gateway Layer -->
+    <g transform="translate(122, 32)">
+      <rect width="105" height="74" rx="4" fill="#0C1826" stroke="#C98A45" stroke-width="1.2"/>
+      <rect x="0" y="0" width="105" height="16" rx="4" fill="#2C1F10"/>
+      <text x="8" y="12" fill="#FFD6A5" font-size="8.5" font-weight="700">02 // GATEWAY</text>
+      <text x="8" y="32" fill="#FFFFFF" font-size="11" font-weight="700">Express / Node</text>
+      <text x="8" y="46" fill="#8499AA" font-size="8">JWT Bearer Verify</text>
+      <text x="8" y="58" fill="#8499AA" font-size="8">Input Sanitization</text>
+      <text x="8" y="68" fill="#C98A45" font-size="7.5">PORT: 5000</text>
+    </g>
+
+    <!-- Arrow 2 -> 3 -->
+    <path d="M 227 69 L 243 69" stroke="#C98A45" stroke-width="1.5" fill="none"/>
+    <polygon points="243,66 249,69 243,72" fill="#C98A45"/>
+    <text x="229" y="62" fill="#8499AA" font-size="7">REST/gRPC</text>
+
+    <!-- Node 3: AI/ML Microservice -->
+    <g transform="translate(249, 32)">
+      <rect width="105" height="74" rx="4" fill="#0C1826" stroke="#61E8FF" stroke-width="1.2"/>
+      <rect x="0" y="0" width="105" height="16" rx="4" fill="#132A40"/>
+      <text x="8" y="12" fill="#61E8FF" font-size="8.5" font-weight="700">03 // INFERENCE</text>
+      <text x="8" y="32" fill="#FFFFFF" font-size="11" font-weight="700">FastAPI ML</text>
+      <text x="8" y="46" fill="#8499AA" font-size="8">Uvicorn Async Core</text>
+      <text x="8" y="58" fill="#8499AA" font-size="8">Numpy Vectorized</text>
+      <text x="8" y="68" fill="#61E8FF" font-size="7.5">PORT: 8000</text>
+    </g>
+
+    <!-- Arrow 2 down to 4 (Database) -->
+    <path d="M 174 106 L 174 120 L 374 120 L 374 69 L 368 69" stroke="#8499AA" stroke-width="1" stroke-dasharray="2 2" fill="none"/>
+
+    <!-- Node 4: Persistence Layer -->
+    <g transform="translate(366, 32)">
+      <rect width="89" height="74" rx="4" fill="#0C1826" stroke="#1D2E42" stroke-width="1.2"/>
+      <rect x="0" y="0" width="89" height="16" rx="4" fill="#162536"/>
+      <text x="8" y="12" fill="#A8C8FF" font-size="8.5" font-weight="700">04 // DB</text>
+      <text x="8" y="32" fill="#FFFFFF" font-size="11" font-weight="700">MongoDB</text>
+      <text x="8" y="46" fill="#8499AA" font-size="8">User Portfolios</text>
+      <text x="8" y="58" fill="#8499AA" font-size="8">Risk Profile Logs</text>
+      <text x="8" y="68" fill="#A8C8FF" font-size="7.5">PORT: 27017</text>
+    </g>
+
+    <!-- Lower Half of Left Panel: 6-Stage ML Pipeline Sequencer -->
+    <rect y="118" width="455" height="188" rx="5" fill="#07111B" stroke="#1D2E42" stroke-width="1"/>
+    
+    <rect x="1" y="119" width="453" height="22" rx="4" fill="#0B1A28"/>
+    <text x="10" y="134" fill="#FFD6A5" font-size="9.5" font-weight="700">6-STAGE ML PIPELINE EXECUTION PIPELINE</text>
+    <text x="325" y="134" fill="#61E8FF" font-size="8.5">ASYNC ORCHESTRATION</text>
+
+    <!-- 6 Interactive Step Blocks in 2x3 Matrix -->
+    <!-- Stage 1 -->
+    <g transform="translate(10, 148)">
+      <rect width="138" height="46" rx="3.5" fill="#0D1A27" stroke="#253B50" stroke-width="1"/>
+      <circle cx="10" cy="12" r="3.5" fill="#61E8FF"/>
+      <text x="20" y="15" fill="#FFFFFF" font-size="9" font-weight="700">01. Risk Profiling</text>
+      <text x="10" y="29" fill="#C98A45" font-size="8">K-Means Clustering</text>
+      <text x="10" y="40" fill="#8499AA" font-size="7.5">k=4 Behavioral Clusters</text>
+    </g>
+
+    <!-- Stage 2 -->
+    <g transform="translate(158, 148)">
+      <rect width="138" height="46" rx="3.5" fill="#0D1A27" stroke="#C98A45" stroke-width="1.2"/>
+      <circle cx="10" cy="12" r="3.5" fill="#C98A45"/>
+      <text x="20" y="15" fill="#FFD6A5" font-size="9" font-weight="700">02. Asset Growth</text>
+      <text x="10" y="29" fill="#61E8FF" font-size="8">XGBoost Regressor</text>
+      <text x="10" y="40" fill="#8499AA" font-size="7.5">R²=0.94 • 120 Estimators</text>
+    </g>
+
+    <!-- Stage 3 -->
+    <g transform="translate(306, 148)">
+      <rect width="138" height="46" rx="3.5" fill="#0D1A27" stroke="#253B50" stroke-width="1"/>
+      <circle cx="10" cy="12" r="3.5" fill="#61E8FF"/>
+      <text x="20" y="15" fill="#FFFFFF" font-size="9" font-weight="700">03. Retirement Trend</text>
+      <text x="10" y="29" fill="#61E8FF" font-size="8">LSTM Recurrent Net</text>
+      <text x="10" y="40" fill="#8499AA" font-size="7.5">Multi-Decade Projection</text>
+    </g>
+
+    <!-- Stage 4 -->
+    <g transform="translate(10, 202)">
+      <rect width="138" height="46" rx="3.5" fill="#0D1A27" stroke="#253B50" stroke-width="1"/>
+      <circle cx="10" cy="12" r="3.5" fill="#8499AA"/>
+      <text x="20" y="15" fill="#FFFFFF" font-size="9" font-weight="700">04. Inflation Adjust</text>
+      <text x="10" y="29" fill="#A8C8FF" font-size="8">Stochastic Modeling</text>
+      <text x="10" y="40" fill="#8499AA" font-size="7.5">Monte Carlo 10,000 Runs</text>
+    </g>
+
+    <!-- Stage 5 -->
+    <g transform="translate(158, 202)">
+      <rect width="138" height="46" rx="3.5" fill="#0D1A27" stroke="#253B50" stroke-width="1"/>
+      <circle cx="10" cy="12" r="3.5" fill="#C98A45"/>
+      <text x="20" y="15" fill="#FFFFFF" font-size="9" font-weight="700">05. Strategy Allocator</text>
+      <text x="10" y="29" fill="#C98A45" font-size="8">Rule Engine / Markowitz</text>
+      <text x="10" y="40" fill="#8499AA" font-size="7.5">Dynamic Equity/Debt Tilt</text>
+    </g>
+
+    <!-- Stage 6 -->
+    <g transform="translate(306, 202)">
+      <rect width="138" height="46" rx="3.5" fill="#0D1A27" stroke="#FFB4AB" stroke-width="1"/>
+      <circle cx="10" cy="12" r="3.5" fill="#FFB4AB"/>
+      <text x="20" y="15" fill="#FFB4AB" font-size="9" font-weight="700">06. Anomaly Guard</text>
+      <text x="10" y="29" fill="#FFB4AB" font-size="8">Isolation Forest</text>
+      <text x="10" y="40" fill="#8499AA" font-size="7.5">Outlier Drawdown Warning</text>
+    </g>
+
+    <!-- Pipeline Status Bar -->
+    <rect x="10" y="258" width="434" height="22" rx="3" fill="#0A1624" stroke="#1D2E42" stroke-width="0.8"/>
+    <text x="18" y="272" fill="#61E8FF" font-size="8.5">TOTAL PIPELINE EXECUTION LATENCY: 28.4ms</text>
+    <text x="280" y="272" fill="#FFD6A5" font-size="8.5">CONFIDENCE SCORE: 96.2%</text>
+  </g>
+
+  <!-- RIGHT PANEL: SIMULATED CAPITAL ACCUMULATION & DRAWDOWN CURVE (x: 485 -> 924) -->
+  <g transform="translate(485, 44)">
+    <rect width="439" height="312" rx="5" fill="#07111B" stroke="#1D2E42" stroke-width="1"/>
+    
+    <!-- Header -->
+    <rect x="1" y="1" width="437" height="26" rx="4" fill="#0B1A28"/>
+    <text x="12" y="18" fill="#FFD6A5" font-size="10" font-weight="700">SIMULATED CAPITAL ACCUMULATION &amp; DRAWDOWN</text>
+    <text x="350" y="18" fill="#8499AA" font-size="8.5">40-YR HORIZON</text>
+
+    <!-- Chart Grid Lines & Y-Axis Labels -->
+    <g opacity="0.6">
+      <line x1="45" y1="50" x2="415" y2="50" stroke="#1A2D40" stroke-dasharray="2 3"/>
+      <text x="12" y="53" fill="#8499AA" font-size="8.5">$3.5M</text>
+
+      <line x1="45" y1="95" x2="415" y2="95" stroke="#1A2D40" stroke-dasharray="2 3"/>
+      <text x="12" y="98" fill="#8499AA" font-size="8.5">$2.5M</text>
+
+      <line x1="45" y1="140" x2="415" y2="140" stroke="#1A2D40" stroke-dasharray="2 3"/>
+      <text x="12" y="143" fill="#8499AA" font-size="8.5">$1.5M</text>
+
+      <line x1="45" y1="185" x2="415" y2="185" stroke="#1A2D40" stroke-dasharray="2 3"/>
+      <text x="12" y="188" fill="#8499AA" font-size="8.5">$500K</text>
+
+      <line x1="45" y1="225" x2="415" y2="225" stroke="#253D54" stroke-width="1"/>
+      <text x="24" y="228" fill="#8499AA" font-size="8.5">$0</text>
+
+      <!-- X-Axis Labels -->
+      <text x="45" y="242" fill="#8499AA" font-size="8">AGE 25</text>
+      <text x="135" y="242" fill="#8499AA" font-size="8">AGE 35</text>
+      <text x="225" y="242" fill="#FFD6A5" font-size="8.5" font-weight="700">AGE 45 [RETIRE]</text>
+      <text x="320" y="242" fill="#8499AA" font-size="8">AGE 55</text>
+      <text x="388" y="242" fill="#8499AA" font-size="8">AGE 65</text>
+    </g>
+
+    <!-- Inflection Point Marker at X=240 -->
+    <line x1="240" y1="40" x2="240" y2="225" stroke="#61E8FF" stroke-width="1" stroke-dasharray="3 3" opacity="0.8"/>
+    <rect x="185" y="34" width="110" height="18" rx="3" fill="#0C2030" stroke="#61E8FF" stroke-width="0.8"/>
+    <text x="240" y="46" fill="#61E8FF" font-size="8" font-weight="700" text-anchor="middle">INFLECTION POINT (Y20)</text>
+
+    <!-- Area Fill Under Accumulation Curve -->
+    <path d="M 45 220 C 110 215, 170 170, 240 75 C 290 85, 340 100, 415 130 L 415 225 L 45 225 Z" fill="url(#corp-area-grad)"/>
+
+    <!-- Curve 1: High-Growth Portfolio (Copper/Gold) -->
+    <path d="M 45 220 C 110 215, 170 170, 240 75 C 300 56, 360 48, 415 44" fill="none" stroke="url(#corp-gold-grad)" stroke-width="2.6" filter="url(#corp-glow-copper)"/>
+
+    <!-- Curve 2: Drawdown / Sustained Annuity Curve (Cyan Dashed) -->
+    <path d="M 45 222 C 110 218, 170 180, 240 75 C 295 105, 350 145, 415 178" fill="none" stroke="url(#corp-cyan-draw)" stroke-width="2" stroke-dasharray="5 3" filter="url(#corp-glow-cyan)"/>
+
+    <!-- Intersect Node -->
+    <circle cx="240" cy="75" r="5" fill="#FFFFFF" stroke="#C98A45" stroke-width="2.5" filter="url(#corp-glow-copper)"/>
+    <circle cx="415" cy="44" r="3.5" fill="#FFE0B2" stroke="#060B12" stroke-width="1.5"/>
+    <circle cx="415" cy="178" r="3.5" fill="#61E8FF" stroke="#060B12" stroke-width="1.5"/>
+
+    <!-- Live Telemetry Callouts -->
+    <g transform="translate(290, 60)">
+      <rect width="125" height="24" rx="3" fill="#122434" stroke="#C98A45" stroke-width="0.8"/>
+      <text x="8" y="11" fill="#8499AA" font-size="7">MAX CAPITAL PEAK</text>
+      <text x="8" y="20" fill="#FFD6A5" font-size="9" font-weight="700">$3.42M (Y40 ACCUMULATION)</text>
+    </g>
+
+    <g transform="translate(265, 185)">
+      <rect width="150" height="22" rx="3" fill="#0F2433" stroke="#61E8FF" stroke-width="0.8"/>
+      <text x="8" y="15" fill="#61E8FF" font-size="8.5" font-weight="600">SAFE HARBOR DRAWDOWN: 4.1%</text>
+    </g>
+
+    <!-- Bottom Metric Tags -->
+    <g transform="translate(14, 260)">
+      <rect width="95" height="38" rx="3" fill="#0C1927" stroke="#1D2E42" stroke-width="0.8"/>
+      <text x="8" y="14" fill="#8499AA" font-size="7.5">SAVINGS RATE</text>
+      <text x="8" y="30" fill="#FFD6A5" font-size="12" font-weight="700">32.5% / MO</text>
+    </g>
+
+    <g transform="translate(118, 260)">
+      <rect width="95" height="38" rx="3" fill="#0C1927" stroke="#1D2E42" stroke-width="0.8"/>
+      <text x="8" y="14" fill="#8499AA" font-size="7.5">INFLATION EXP</text>
+      <text x="8" y="30" fill="#61E8FF" font-size="12" font-weight="700">6.2% CAGR</text>
+    </g>
+
+    <g transform="translate(222, 260)">
+      <rect width="100" height="38" rx="3" fill="#0C1927" stroke="#1D2E42" stroke-width="0.8"/>
+      <text x="8" y="14" fill="#8499AA" font-size="7.5">EQUITY RATIO</text>
+      <text x="8" y="30" fill="#FFD6A5" font-size="12" font-weight="700">70:30 GLIDE</text>
+    </g>
+
+    <g transform="translate(330, 260)">
+      <rect width="95" height="38" rx="3" fill="#0C1927" stroke="#1D2E42" stroke-width="0.8"/>
+      <text x="8" y="14" fill="#8499AA" font-size="7.5">FIRE SUCCESS</text>
+      <text x="8" y="30" fill="#A8C8FF" font-size="12" font-weight="700">98.4% PROB</text>
+    </g>
+  </g>
+
+  <!-- Global Footer Legend -->
+  <g transform="translate(20, 362)">
+    <circle cx="4" cy="-2" r="3" fill="#C98A45"/>
+    <text x="14" y="1" fill="#FFD6A5" font-size="8.5">ACCUMULATION TRAJECTORY</text>
+
+    <circle cx="190" cy="-2" r="3" fill="#61E8FF"/>
+    <text x="200" y="1" fill="#61E8FF" font-size="8.5">RETIREMENT DRAWDOWN</text>
+
+    <circle cx="360" cy="-2" r="3" fill="#A8C8FF"/>
+    <text x="370" y="1" fill="#8499AA" font-size="8.5">REST API TELEMETRY</text>
+
+    <text x="680" y="1" fill="#8499AA" font-size="8.5">CONTAINER REPO: corpus-ai-core // v2.4.0</text>
+  </g>
+</svg>

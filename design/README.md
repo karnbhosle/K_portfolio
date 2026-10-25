@@ -1,12 +1,21 @@
-# Stitch design provenance
+# Design provenance
 
-The frontend visual design was generated using the connected **Stitch MCP**, in private project `4839009819091884978` (KARNA / CORE). The working connection was used directly; no credentials are stored in this repository.
+The visual language was generated with the connected **Stitch MCP** in private project `4839009819091884978` (KARNA / CORE). No credentials are stored in this repository.
 
-- Design system: `assets/7711881164605486118`
-- Original desktop screen: `150994ea7f9a435f98c5fe36303597c0`
-- Revised responsive screen: `97a20b8045a7472fac70014227aa1ef3`
-- Exports: `stitch/desktop-original.html` and `stitch/desktop-revised.html`
+- Design system: `assets/7711881164605486118`, exported as `resources/stitch_karna_core_portfolio_ui/karna_core/DESIGN.md`
+- Screen references: `stitch/initiation.html`, `stitch/transition.html` and `stitch/portfolio.html`
+- Diagram references: `resources/stitch_karna_core_portfolio_ui/*_diagram/`
 
-These unserved exports are visual references, **not factual content sources or deployable app pages**. Stitch added unsupported production claims, telemetry, language levels, inaccurate event details and altered anchors in its drafts. The application substitutes the canonical shared content, required anchors, exact roles and null assets. None of the inaccurate copy is used by the application.
+These exports are references, **not content sources or deployable pages**. Stitch filled them with invented telemetry (latency, flux and "energy matrix" readings), fabricated model metrics, AQI readings, investment figures, unverified badges and an unexplained handle. None of that is used.
 
-The original SVG geometry was converted into React Server Components in `apps/web/src/components/stitch-artwork.tsx`; unsupported labels were removed. The generated layout, palette and typography were adapted into semantic App Router components and Tailwind/CSS in `apps/web/src/app`. Native links, safe contact handling, reduced motion, offscreen pausing and accessible certificate dialogs are functional implementation work. No other image generation/design service, stock imagery or movie assets were used. The original CV was read locally and is not in this repository or public assets.
+## What the application takes from the references
+
+The current frontend is an original implementation of the design system, not a pixel port:
+
+- **Palette and roles.** OLED black canvas, reactor cyan for live and interactive state only, engineering copper for milestones (the MCA in progress, the 2nd-place result, CorpusAI), and a muted blue-grey text scale. Text and control colours meet WCAG AA.
+- **Type.** Space Grotesk for display, Inter for reading, JetBrains Mono for short metadata labels only. Fonts are self-hosted with `next/font/local` from `apps/web/src/app/fonts` (SIL Open Font License files included).
+- **Console details.** Hairline structure, corner ticks on the two framed surfaces, an indexed 01–06 section system that matches the navigation, and the "Open to SDE roles" status pill.
+- **The arc reactor.** One SVG drawn in layers, reused by the ignition intro (the signature moment) and the faint background reactor pinned behind every section. Glow comes from gradients rather than blur filters to stay cheap to composite.
+- **Layouts.** The left navigation rail and ignition flow from the Stitch screens, rebuilt with real anchors, a mobile menu dialog and layouts verified from 320px up.
+
+The project diagrams were redrawn from canonical content (`architecture`, `pipeline` and `features` in `packages/shared/src/seed.ts`), so they are legible on a phone and state nothing the CV does not. The AQI scale describes the public CPCB standard, labelled as such.

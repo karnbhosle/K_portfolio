@@ -19,6 +19,11 @@ export function readConfig(env: NodeJS.ProcessEnv = process.env) {
     } catch { return true; }
   })) throw new Error('ALLOWED_ORIGINS must contain explicit HTTP origins.');
 
+  const retryIntervalMs = integer(env.NOTIFY_RETRY_INTERVAL_MS, 300_000, 0, 86_400_000);
+  if (retryIntervalMs > 0 && retryIntervalMs < 10_000) {
+    throw new Error('NOTIFY_RETRY_INTERVAL_MS must be 0 (disabled) or at least 10000.');
+  }
+
   return {
     host: env.HOST ?? '127.0.0.1',
     port: integer(env.PORT, 4000, 1, 65535),
@@ -34,7 +39,17 @@ export function readConfig(env: NodeJS.ProcessEnv = process.env) {
       from: env.SMTP_FROM ?? '',
       to: env.SMTP_TO ?? 'karnabhosle223@gmail.com',
     },
+    notifications: {
+      retryIntervalMs,
+      maxAttempts: integer(env.NOTIFY_MAX_ATTEMPTS, 5, 1, 20),
+    },
   };
 }
 
 export type AppConfig = ReturnType<typeof readConfig>;
+
+/** True when some SMTP settings are present but not enough to send, which usually means a typo. */
+export function smtpIncomplete(smtp: AppConfig['smtp']): boolean {
+  const set = [smtp.host, smtp.from, smtp.to].filter(Boolean).length;
+  return (Boolean(smtp.host) || Boolean(smtp.from) || Boolean(smtp.user)) && set < 3;
+}
