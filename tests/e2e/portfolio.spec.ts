@@ -57,9 +57,16 @@ test.describe('ignition intro', () => {
     const reactor = intro.getByRole('button', { name: /Ignite the arc reactor/ });
     await expect(reactor).toBeFocused();
     await expect(page.locator('#site')).toHaveJSProperty('inert', true);
+    const clip = intro.locator('audio[src="/audio/repulsor.mp3"]');
+    await expect(clip).toHaveJSProperty('paused', true);
 
     await reactor.press('Enter');
+    await expect.poll(() => clip.evaluate((element: HTMLAudioElement) =>
+      !element.paused && !element.muted && element.volume > 0 ? element.currentTime : 0,
+    )).toBeGreaterThan(0.1);
     await expect(intro.getByRole('progressbar', { name: 'Ignition' })).not.toHaveAttribute('aria-valuenow', '0');
+    await expect(page.locator('html')).toHaveAttribute('data-intro', 'leaving', { timeout: 10_000 });
+    expect(await clip.evaluate((element: HTMLAudioElement) => element.currentTime)).toBeGreaterThanOrEqual(4);
     await expect(intro).toBeHidden({ timeout: 10_000 });
     await expect(page.locator('#site')).toHaveJSProperty('inert', false);
     await expect(page.getByRole('heading', { level: 1, name: 'Karna Bhosle' })).toBeFocused();

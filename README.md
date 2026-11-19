@@ -2,6 +2,10 @@
 
 Karna Bhosle's single-page portfolio. A first visit opens on an arc reactor: press the core, it charges with the repulsor sound and discharges into the portfolio. Six anchored sections follow: Know Karna, Qualifications, Projects, Tech matrix, Leadership & awards and Contact. Every fact on the page comes from Karna's CV through one typed content file; the API, the page and the structured data all read it.
 
+## Host online
+
+Follow [the beginner hosting guide](HOSTING_GUIDE.md) for the complete Vercel + Render + MongoDB Atlas free setup, exact deployment settings, contact-form verification and troubleshooting.
+
 ## Run locally
 
 Requires Node.js **22.12+** (tested on 24.12), npm, and MongoDB 8 or a MongoDB Atlas connection. Docker Desktop is optional. From the repository root:

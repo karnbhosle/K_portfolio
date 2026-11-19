@@ -6,7 +6,6 @@ import { Volume, VolumeOff } from '@/components/ui/icons';
 import {
   getIntroPhase, getMotion, getSound, replayIntroEvent, setIntroPhase, setSound, useIntroPhase, useSound,
 } from '@/lib/preferences';
-import { IgnitionAudio } from './ignition-audio';
 
 /*
  * Timed to the repulsor clip (5.5s). Its loudness envelope: a click at 1.00s, a second at 2.05s,
@@ -17,7 +16,7 @@ const CHARGE_MS = 3150; // click -> blast
 const DISCHARGE_MS = 900; // blast -> second boom
 const LEAVE_MS = 1400; // second boom -> the visor HUD boots and the faceplate opens onto the portfolio
 const QUICK_CHARGE_MS = 1200; // motion and sound both off: nothing to sync to
-const AUDIO_START_WAIT_MS = 250;
+const AUDIO_START_WAIT_MS = 1500;
 const MAX_LAG_MS = 400; // if the clip stalls, the visuals wait at most this long for it
 
 const easeInOut = (t: number) => (t < 0.5 ? 4 * t ** 3 : 1 - (-2 * t + 2) ** 3 / 2);
@@ -36,7 +35,8 @@ export function IgnitionIntro({ name, tagline }: { name: string; tagline: string
   const sound = useSound();
   const [progress, setProgress] = useState(0);
   const trigger = useRef<HTMLButtonElement>(null);
-  const audio = useRef<IgnitionAudio | null>(null);
+  const audio = useRef<HTMLAudioElement>(null);
+  const starting = useRef(false);
   const timers = useRef<number[]>([]);
   const frame = useRef<number | undefined>(undefined);
 
@@ -52,7 +52,7 @@ export function IgnitionIntro({ name, tagline }: { name: string; tagline: string
     clearTimers();
     const root = document.documentElement;
     if (skipped) {
-      audio.current?.stop();
+      audio.current?.pause();
       root.dataset.introSkipped = ''; // skipping goes straight to the page, no suit-up
     }
     // The visor's targeting reticle locks onto the hero reactor.
@@ -72,13 +72,25 @@ export function IgnitionIntro({ name, tagline }: { name: string; tagline: string
   }, [clearTimers]);
 
   const ignite = useCallback(async () => {
-    if (getIntroPhase() !== 'pending') return;
+    if (getIntroPhase() !== 'pending' || starting.current) return;
     const withSound = getSound() === 'on';
     const quick = getMotion() === 'off' && !withSound;
     const charge = quick ? QUICK_CHARGE_MS : CHARGE_MS;
-    // Start the visuals when the sound actually starts (usually within a frame or two), never later than 250ms.
-    if (withSound && audio.current) {
-      await Promise.race([audio.current.play(), new Promise((resolve) => window.setTimeout(resolve, AUDIO_START_WAIT_MS))]);
+    const clip = audio.current;
+    if (withSound && clip) {
+      starting.current = true;
+      clip.currentTime = 0;
+      clip.muted = false;
+      // Call play inside the click or keyboard gesture so mobile browsers can allow audio.
+      let timeout: number | undefined;
+      const played = await Promise.race([
+        clip.play().then(() => true, () => false),
+        new Promise<boolean>((resolve) => { timeout = window.setTimeout(() => resolve(false), AUDIO_START_WAIT_MS); }),
+      ]);
+      window.clearTimeout(timeout);
+      starting.current = false;
+      // Cancel pending playback before continuing silently so it cannot start midway through the transition.
+      if (!played) clip.pause();
       if (getIntroPhase() !== 'pending') return;
     }
     setIntroPhase('charging');
@@ -96,10 +108,11 @@ export function IgnitionIntro({ name, tagline }: { name: string; tagline: string
     // The clip is the clock: the blast and the hand-off land on its beats wherever its playhead is.
     // A stalled clip can hold the visuals back by MAX_LAG_MS at most, so the intro never freezes.
     let discharged = false;
+    let clock = 0;
     const tick = (now: number) => {
       const wall = now - started;
-      const heard = withSound ? audio.current?.time() : null;
-      const clock = heard == null ? wall : Math.max(heard * 1000, wall - MAX_LAG_MS);
+      const heard = withSound && clip && !clip.paused && !clip.ended ? clip.currentTime * 1000 : wall;
+      clock = Math.max(clock, heard, wall - MAX_LAG_MS);
       setProgress(Math.round(easeInOut(Math.min(1, clock / CHARGE_MS)) * 100));
       if (!discharged && clock >= CHARGE_MS) { discharged = true; setIntroPhase('discharge'); }
       if (clock >= CHARGE_MS + DISCHARGE_MS) { frame.current = undefined; finish(false); return; }
@@ -111,15 +124,13 @@ export function IgnitionIntro({ name, tagline }: { name: string; tagline: string
     timers.current.push(window.setTimeout(() => finish(false), CHARGE_MS + DISCHARGE_MS + MAX_LAG_MS));
   }, [finish]);
 
-  // Mount: mark hydration for the boot-script failsafe, warm up the sound, and cleanly tear down.
+  // Mark hydration for the boot-script failsafe and stop playback if the component unmounts.
   useEffect(() => {
     window.__karnaIntroReady = true;
-    const player = new IgnitionAudio();
-    audio.current = player;
-    if (getIntroPhase() === 'pending') player.preload();
+    const clip = audio.current;
     return () => {
       clearTimers();
-      player.dispose();
+      clip?.pause();
     };
   }, [clearTimers]);
 
@@ -145,8 +156,7 @@ export function IgnitionIntro({ name, tagline }: { name: string; tagline: string
   useEffect(() => {
     const replay = () => {
       clearTimers();
-      audio.current?.stop();
-      audio.current?.preload();
+      audio.current?.pause();
       setProgress(0);
       window.scrollTo({ top: 0, behavior: 'instant' });
       setIntroPhase('pending');
@@ -159,6 +169,8 @@ export function IgnitionIntro({ name, tagline }: { name: string; tagline: string
 
   return (
     <div className="intro no-print" role="dialog" aria-modal="true" aria-labelledby="intro-title" aria-describedby="intro-hint">
+      {/* The supplied repulsor recording plays from the same origin as the page. */}
+      <audio ref={audio} src="/audio/repulsor.mp3" preload={phase === 'pending' && sound === 'on' ? 'auto' : 'none'} hidden />
       {/* Deep space behind the pinned reactor: the photo, graded toward the site's cyan, drifting slowly. */}
       <div className="intro-bg pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
         <div className="intro-space absolute inset-[-8%]" />
@@ -204,7 +216,7 @@ export function IgnitionIntro({ name, tagline }: { name: string; tagline: string
             className="btn btn-quiet"
             aria-pressed={sound === 'on'}
             onClick={() => {
-              if (sound === 'on') audio.current?.stop();
+              if (sound === 'on') audio.current?.pause();
               setSound(sound === 'on' ? 'off' : 'on');
             }}
           >

@@ -1,3 +1,4 @@
+import { resolve } from 'node:path';
 import type { NextConfig } from 'next';
 
 /** The browser may only talk to this site, the configured contact API and the public air-quality feed. */
@@ -28,6 +29,8 @@ const contentSecurityPolicy = [
 
 const config: NextConfig = {
   poweredByHeader: false,
+  // Resolve the workspace link and compiled package from the repository root.
+  turbopack: { root: resolve(__dirname, '../..') },
   transpilePackages: ['@karna/shared'],
   async headers() {
     const security = [
