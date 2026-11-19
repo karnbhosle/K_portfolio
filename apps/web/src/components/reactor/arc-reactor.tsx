@@ -32,6 +32,7 @@ export function ArcReactor({ id, className, core }: { id: string; className?: st
 
         <circle className="intro-halo reactor-layer" cx="200" cy="200" r="200" fill={`url(#${halo})`} />
 
+        <g className="reactor-shell" data-shell="stator">
         <g className="reactor-layer" data-layer="stator" data-spin="forward">
           <circle cx="200" cy="200" r="190" stroke="#FFFFFF" strokeOpacity="0.35" strokeDasharray="2 9" strokeWidth="1" fill="none" />
           <circle cx="200" cy="200" r="184" stroke="#61E8FF" strokeOpacity="0.75" strokeDasharray="14 26 40 12" strokeWidth="1.6" fill="none" />
@@ -45,7 +46,9 @@ export function ArcReactor({ id, className, core }: { id: string; className?: st
             </g>
           ))}
         </g>
+        </g>
 
+        <g className="reactor-shell" data-shell="coils">
         <g className="reactor-layer" data-layer="coils" data-spin="reverse">
           <circle cx="200" cy="200" r="148" stroke="#132433" strokeWidth="18" fill="none" />
           <circle cx="200" cy="200" r="148" stroke="#61E8FF" strokeOpacity="0.85" strokeDasharray="7 15" strokeWidth="1.6" fill="none" />
@@ -57,16 +60,21 @@ export function ArcReactor({ id, className, core }: { id: string; className?: st
             </g>
           ))}
         </g>
+        </g>
 
+        <g className="reactor-shell" data-shell="guide">
         <g className="reactor-layer" data-layer="guide" data-spin="forward">
           <circle cx="200" cy="200" r="118" stroke="#61E8FF" strokeOpacity="0.75" strokeDasharray="5 9" strokeWidth="1.3" fill="none" />
           <circle cx="200" cy="200" r="108" stroke="#FFFFFF" strokeOpacity="0.4" strokeDasharray="1 6" strokeWidth="1" fill="none" />
           <path d="M200 82v0M318 200h0M200 318v0M82 200h0" stroke="#61E8FF" strokeWidth="6" strokeLinecap="round" />
         </g>
+        </g>
 
+        <g className="reactor-shell" data-shell="lens">
         <g className="reactor-layer" data-layer="lens">
           <circle cx="200" cy="200" r="96" stroke="#61E8FF" strokeOpacity="0.6" strokeWidth="1.4" fill="none" />
           <circle cx="200" cy="200" r="88" stroke="#218CFF" strokeOpacity="0.55" strokeDasharray="2 4" strokeWidth="1" fill="none" />
+        </g>
         </g>
 
         <g className="reactor-layer">
@@ -77,7 +85,7 @@ export function ArcReactor({ id, className, core }: { id: string; className?: st
           <circle cx="200" cy="200" r="60" stroke="#61E8FF" strokeOpacity="0.4" strokeDasharray="3 4" strokeWidth="1" fill="none" />
         </g>
       </svg>
-      {core ? <div className="absolute inset-0 flex items-center justify-center">{core}</div> : null}
+      {core ? <div className="absolute inset-0 flex items-center justify-center [container-type:inline-size]">{core}</div> : null}
     </div>
   );
 }

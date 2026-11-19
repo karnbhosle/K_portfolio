@@ -1,6 +1,6 @@
 import type { NextConfig } from 'next';
 
-/** The browser may only talk to this site and the configured contact API. */
+/** The browser may only talk to this site, the configured contact API and the public air-quality feed. */
 function apiOrigin(): string {
   try {
     return new URL(process.env.NEXT_PUBLIC_API_BASE_URL ?? '').origin;
@@ -18,7 +18,8 @@ const contentSecurityPolicy = [
   "img-src 'self' data: blob:",
   "font-src 'self'",
   "media-src 'self'",
-  `connect-src 'self'${apiOrigin() ? ` ${apiOrigin()}` : ''}`,
+  // Open-Meteo: the live Mumbai air-quality reading in the AeroSense case study.
+  `connect-src 'self' https://air-quality-api.open-meteo.com${apiOrigin() ? ` ${apiOrigin()}` : ''}`,
   "object-src 'none'",
   "base-uri 'self'",
   "form-action 'self'",

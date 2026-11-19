@@ -54,6 +54,8 @@ export const educationSchema = z.object({
   institution: text,
   period: text,
   status: optionalText,
+  /** Final result as Karna reports it: a percentage, a CGPA, or "Pursuing". */
+  result: optionalText,
 }).strict();
 
 export const trainingSchema = z.object({

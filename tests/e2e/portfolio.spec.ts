@@ -156,6 +156,111 @@ test.describe('navigation and structure', () => {
     await expect(details).not.toHaveAttribute('open', '');
   });
 
+  test('Corpus Run plays a round and explains CorpusAI', async ({ page }) => {
+    await page.goto('/#projects');
+    const game = page.getByRole('region', { name: 'CorpusAI arcade · Corpus Run' });
+    await expect(game).toContainText('Race to retirement');
+    await game.getByRole('button', { name: 'Play now' }).click();
+    await expect(game).not.toContainText('Age 25', { timeout: 3_000 });
+    await page.keyboard.press('ArrowLeft');
+    await game.getByRole('button', { name: 'End' }).click();
+    await expect(game.getByRole('status')).toContainText(/Run ended at age \d+|Retired at 60/);
+    await expect(game).toContainText('Coins: investments made');
+    await expect(game.getByRole('button', { name: 'Play again' })).toBeVisible();
+  });
+
+  test('Smog Invaders plays a round and explains AeroSense', async ({ page }) => {
+    await page.goto('/#projects');
+    const game = page.getByRole('region', { name: 'AeroSense arcade · Smog Invaders' });
+    await game.getByRole('button', { name: 'Play now' }).click();
+    // The ship fires on its own; steering toward the middle clears at least one invader.
+    await expect(game).not.toContainText('Cleared 0', { timeout: 8_000 });
+    await game.getByRole('button', { name: 'End' }).click();
+    await expect(game.getByRole('status')).toContainText(/\d+ pollutants? destroyed/);
+  });
+
+  test('a game can be skipped for a plain explanation', async ({ page }) => {
+    await page.goto('/#projects');
+    const game = page.getByRole('region', { name: 'AeroSense arcade · Smog Invaders' });
+    await game.getByRole('button', { name: 'Just tell me about AeroSense' }).click();
+    await expect(game).toContainText('PM2.5, PM10, NOx, NH3, CO, SO2 and O3');
+  });
+
+  test('Corpus Run shows Karna as the player and three lives', async ({ page }) => {
+    await page.goto('/#projects');
+    const game = page.getByRole('region', { name: 'CorpusAI arcade · Corpus Run' });
+    await expect(game.getByRole('img', { name: /Player: Karna/ })).toBeVisible();
+    await game.getByRole('button', { name: 'Play now' }).click();
+    await expect(game.getByRole('img', { name: '3 lives left' })).toBeVisible();
+    await page.keyboard.press('ArrowUp'); // jump
+    await page.keyboard.press(' ');
+    await game.getByRole('button', { name: 'End' }).click();
+    await expect(game.getByRole('status')).toContainText(/hurdles? jumped/);
+  });
+
+  test('the CorpusAI chart compares three homes for the same money', async ({ page }) => {
+    await page.goto('/#project-corpusai');
+    const chart = page.locator('.viz-card', { hasText: 'Same money, three homes' });
+    await expect(chart).toContainText('₹10,000 a month from age 25 to 60');
+    const amount = chart.getByRole('slider', { name: /Monthly amount/ });
+    await amount.focus();
+    for (let step = 0; step < 20; step += 1) await page.keyboard.press('ArrowRight'); // +₹500 each
+    await expect(chart).toContainText('₹20,000 a month');
+    await chart.getByRole('spinbutton', { name: /Bank FD/ }).fill('7');
+    await chart.getByText('Show as a table').click();
+    const table = chart.getByRole('table');
+    await expect(table).toContainText('Bank FD · 7%');
+    await expect(table.getByRole('row', { name: /^75 / })).toBeVisible();
+    await expect(chart).toContainText('not financial advice');
+  });
+
+  test('the five-metro chart reads the air now and ahead, and says when the feed is down', async ({ page }) => {
+    const day = (offset: number) => {
+      const today = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Kolkata' }).format(new Date());
+      const date = new Date(`${today}T00:00:00Z`);
+      date.setUTCDate(date.getUTCDate() + offset);
+      return date.toISOString().slice(0, 10);
+    };
+    const time = [-1, 0, 1].flatMap((offset) => Array.from({ length: 24 }, (_, hour) => `${day(offset)}T${String(hour).padStart(2, '0')}:00`));
+    const city = (pm: number) => ({ hourly: { time, pm2_5: time.map(() => pm), pm10: time.map(() => pm), nitrogen_dioxide: time.map(() => 10) } });
+    let fail = false;
+    await page.route('**/air-quality-api.open-meteo.com/**', async (route) => {
+      if (fail) return route.abort();
+      return route.fulfill({ json: [city(100), city(40), city(70), city(20), city(10)] });
+    });
+    await page.goto('/#project-aerosense');
+    const chart = page.locator('.viz-card', { hasText: 'Five metros, live' });
+    await expect(chart).toHaveAttribute('data-air', 'ready', { timeout: 10_000 });
+    const now = chart.getByRole('region', { name: 'AQI right now by city' });
+    for (const name of ['Delhi', 'Mumbai', 'Kolkata', 'Chennai', 'Bengaluru']) await expect(now).toContainText(name);
+    await expect(now.getByRole('listitem').first()).toContainText('Delhi');
+    await expect(now.getByRole('listitem').first()).toContainText('Poor');
+    await expect(chart.getByRole('region', { name: /today and tomorrow/ }).getByRole('listitem')).toHaveCount(5);
+    await expect(chart).toContainText('not output from AeroSense’s Random Forest');
+    fail = true;
+    await chart.getByRole('button', { name: 'Refresh' }).click();
+    await expect(chart.getByRole('status')).toContainText('unavailable right now');
+  });
+
+  test('the journey shows each result as it passes', async ({ page }) => {
+    await page.goto('/#qualifications');
+    const scrub = page.getByRole('slider', { name: 'Timeline year' });
+    await scrub.focus();
+    await page.keyboard.press('End');
+    for (const result of ['83%', '83.50%', '7.28 CGPA']) await expect(page.locator('.timeline-result', { hasText: result })).toBeVisible();
+    await expect(scrub).toHaveAttribute('aria-valuetext', /pursuing/i);
+  });
+
+  test('the education timeline can be scrubbed with the keyboard', async ({ page }) => {
+    await page.goto('/#qualifications');
+    const scrub = page.getByRole('slider', { name: 'Timeline year' });
+    await scrub.focus();
+    await page.keyboard.press('End');
+    await expect(scrub).toHaveAttribute('aria-valuetext', /MCA, year 2 of 2/);
+    await page.keyboard.press('Home');
+    await expect(scrub).toHaveAttribute('aria-valuetext', /SSC, year 1 of 1/);
+  });
+
   test('the tech matrix links skills to the projects that use them', async ({ page }) => {
     await page.goto('/#technical-skills');
     const matrix = page.locator('#technical-skills');

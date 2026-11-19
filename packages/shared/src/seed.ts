@@ -27,7 +27,12 @@ export const portfolioSeed: Portfolio = portfolioSchema.parse({
     focusAreas: ["Full-stack development", "Applied machine learning", "API design"],
     languages: ["English", "Hindi", "Marathi"],
     languageProficiency: "Proficient in English, Hindi, and Marathi.",
-    portrait: null,
+    portrait: {
+      path: "/images/profile/karna-portrait.webp",
+      alt: "Karna Bhosle in a dark suit with arms crossed, beside the name Karna in red script and Karna Bhosale in print.",
+      width: 900,
+      height: 837,
+    },
     publicResume: null,
   },
   education: [
@@ -37,6 +42,7 @@ export const portfolioSeed: Portfolio = portfolioSchema.parse({
       institution: "SIES College of Management Studies, Navi Mumbai",
       period: "2025-2027",
       status: "Currently Pursuing",
+      result: "Pursuing",
     },
     {
       id: "bsc-it",
@@ -44,6 +50,7 @@ export const portfolioSeed: Portfolio = portfolioSchema.parse({
       institution: "SIES College of Arts, Science and Commerce",
       period: "2021-2024",
       status: null,
+      result: "7.28 CGPA",
     },
     {
       id: "hsc",
@@ -51,6 +58,7 @@ export const portfolioSeed: Portfolio = portfolioSchema.parse({
       institution: "P.V.G's Vidya Bhawan High School & Junior College",
       period: "2019-2021",
       status: null,
+      result: "83.50%",
     },
     {
       id: "ssc",
@@ -58,6 +66,7 @@ export const portfolioSeed: Portfolio = portfolioSchema.parse({
       institution: "SIES A.P.J Kalam Memorial High School",
       period: "2018-2019",
       status: null,
+      result: "83%",
     },
   ],
   training: [

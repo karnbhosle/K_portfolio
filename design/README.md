@@ -15,7 +15,7 @@ The current frontend is an original implementation of the design system, not a p
 - **Palette and roles.** OLED black canvas, reactor cyan for live and interactive state only, engineering copper for milestones (the MCA in progress, the 2nd-place result, CorpusAI), and a muted blue-grey text scale. Text and control colours meet WCAG AA.
 - **Type.** Space Grotesk for display, Inter for reading, JetBrains Mono for short metadata labels only. Fonts are self-hosted with `next/font/local` from `apps/web/src/app/fonts` (SIL Open Font License files included).
 - **Console details.** Hairline structure, corner ticks on the two framed surfaces, an indexed 01–06 section system that matches the navigation, and the "Open to SDE roles" status pill.
-- **The arc reactor.** One SVG drawn in layers, reused by the ignition intro (the signature moment) and the faint background reactor pinned behind every section. Glow comes from gradients rather than blur filters to stay cheap to composite.
-- **Layouts.** The left navigation rail and ignition flow from the Stitch screens, rebuilt with real anchors, a mobile menu dialog and layouts verified from 320px up.
+- **The arc reactor.** One SVG drawn in layers, reused by the ignition intro (the signature moment), the live hero object and a faint bookend behind the contact section. Glow comes from gradients rather than blur filters to stay cheap to composite.
+- **Layouts.** The ignition flow comes from the Stitch screens. The original left rail became a fixed top bar with a command palette, so the content gets the full width; real anchors, a mobile menu dialog and layouts verified from 320px up.
 
 The project diagrams were redrawn from canonical content (`architecture`, `pipeline` and `features` in `packages/shared/src/seed.ts`), so they are legible on a phone and state nothing the CV does not. The AQI scale describes the public CPCB standard, labelled as such.

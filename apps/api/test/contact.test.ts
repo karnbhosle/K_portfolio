@@ -283,7 +283,9 @@ describe('public content and health', () => {
     expect(result.headers['x-portfolio-source']).toBe('database');
     expect(result.body).not.toHaveProperty('_id');
     expect(result.body).not.toHaveProperty('messages');
-    expect(result.text).not.toMatch(/cgpa|"grades?"|"marks"|"percentage"/i);
+    expect(result.body.education.map((entry: { result: string | null }) => entry.result))
+      .toEqual(portfolioSeed.education.map((entry) => entry.result));
+    expect(result.text).not.toMatch(/"grades?"|"marks"|"percentage"/i);
   });
 
   it('fills optional fields added after older content was stored', async () => {

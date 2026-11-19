@@ -1,7 +1,7 @@
 import { getPortfolio, siteUrl } from '@/lib/portfolio';
 import { formatFacts } from '@/lib/format';
 import { IgnitionIntro } from '@/components/intro/ignition-intro';
-import { AmbientReactor } from '@/components/reactor/ambient-reactor';
+import { CoreJourney } from '@/components/reactor/core-journey';
 import { SiteChrome } from '@/components/site/site-chrome';
 import { SiteFooter } from '@/components/site/site-footer';
 import { ClientRuntime } from '@/components/site/client-runtime';
@@ -34,26 +34,35 @@ export default async function Home() {
     affiliation: { '@type': 'EducationalOrganization', name: profile.institution },
     ...(profile.github ? { sameAs: [profile.github] } : {}),
     ...(url ? { url: url.href } : {}),
+    ...(profile.portrait ? { image: url ? new URL(profile.portrait.path, url).href : profile.portrait.path } : {}),
+  };
+
+  const links = {
+    email: profile.email,
+    emailHref: profile.emailHref,
+    phoneHref: profile.phoneHref,
+    phoneDisplay: profile.phoneDisplay,
+    github: profile.github,
+    repositories: portfolio.projects.map((project) => ({ name: project.name, url: project.repository })),
   };
 
   return (
     <>
       <IgnitionIntro name={profile.displayName} tagline={`${profile.role} · ${formatFacts(profile.educationLine)}`} />
       <div id="site" className="relative">
-        <AmbientReactor />
-        <SiteChrome name={profile.displayName} role={profile.role} footnote={formatFacts(profile.educationLine)} />
-        <div className="relative z-10 lg:pl-sidebar">
-          <div className="mx-auto max-w-content px-5 sm:px-8 lg:px-12 xl:px-16">
-            <main id="main" tabIndex={-1} className="outline-none">
-              <AboutSection portfolio={portfolio} />
-              <QualificationsSection portfolio={portfolio} />
-              <ProjectsSection portfolio={portfolio} />
-              <SkillsSection portfolio={portfolio} />
-              <ActivitiesSection portfolio={portfolio} />
-              <ContactSection portfolio={portfolio} />
-            </main>
-            <SiteFooter profile={profile} />
-          </div>
+        <div className="backdrop" aria-hidden="true" />
+        <CoreJourney />
+        <SiteChrome name={profile.displayName} role={profile.role} footnote={formatFacts(profile.educationLine)} links={links} />
+        <div className="relative z-10">
+          <main id="main" tabIndex={-1} className="outline-none">
+            <AboutSection portfolio={portfolio} />
+            <QualificationsSection portfolio={portfolio} />
+            <ProjectsSection portfolio={portfolio} />
+            <SkillsSection portfolio={portfolio} />
+            <ActivitiesSection portfolio={portfolio} />
+            <ContactSection portfolio={portfolio} />
+          </main>
+          <SiteFooter profile={profile} />
         </div>
       </div>
       <ClientRuntime />

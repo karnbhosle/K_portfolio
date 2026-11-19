@@ -137,9 +137,9 @@ export function ContactForm({ email, emailHref }: { email: string; emailHref: st
         }
         saveDraft(event.currentTarget);
       }}
-      className="panel p-6 sm:p-8"
+      className="panel frame-ticks spot p-6 sm:p-10"
     >
-      <h3 className="font-display text-xl font-medium text-ink">Send a message</h3>
+      <h3 className="font-display text-2xl font-medium tracking-tight text-ink">Send a message</h3>
       <p className="mt-1.5 text-sm text-ink-muted">Tell me about the role or project. For anything urgent, email is fastest.</p>
 
       <div className="mt-7 grid gap-5 sm:grid-cols-2">

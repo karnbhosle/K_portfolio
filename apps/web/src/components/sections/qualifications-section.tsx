@@ -3,65 +3,79 @@ import { formatRange } from '@/lib/format';
 import { order } from '@/lib/style';
 import { SectionHeader } from './section-header';
 import { CertificateButton } from './certificate-button';
+import { EducationTimeline, type TimelineRow } from './education-timeline';
+import { HudDecor } from '@/components/ui/hud-decor';
+import { ScrambleText } from '@/components/ui/scramble-text';
+
+// Shown on hover beside each language: a greeting, nothing more.
+const greetings: Record<string, string> = { English: 'Hello', Hindi: 'नमस्ते', Marathi: 'नमस्कार' };
+
+/** "2025-2027" → [2025, 2027]; a single year spans that year. */
+function years(period: string): [number, number] | null {
+  const found = period.match(/\d{4}/g)?.map(Number);
+  if (!found?.length) return null;
+  return [found[0]!, found[1] ?? found[0]! + 1];
+}
 
 export function QualificationsSection({ portfolio }: { portfolio: Portfolio }) {
   const { education, training, profile } = portfolio;
+  const spans = education.map((entry) => years(entry.period));
+  const known = spans.filter((span): span is [number, number] => Boolean(span));
+  const min = Math.min(...known.map(([start]) => start));
+  const max = Math.max(...known.map(([, end]) => end));
+  const rows: TimelineRow[] = education.map((entry, index) => ({
+    id: entry.id,
+    degree: entry.degree,
+    // "Master of Computer Applications (MCA)" → "MCA"; "B.Sc. (Information Technology)" → "B.Sc."
+    short: entry.degree.match(/\(([A-Z]{2,6})\)/)?.[1] ?? entry.degree.split(' (')[0]!,
+    institution: entry.institution,
+    period: formatRange(entry.period),
+    status: entry.status ?? null,
+    result: entry.result ?? null,
+    span: spans[index] ?? null,
+  }));
+
   return (
-    <section id="qualifications" aria-labelledby="qualifications-title" className="pt-24 sm:pt-32">
+    <section id="qualifications" aria-labelledby="qualifications-title" className="shell pt-28 sm:pt-40">
       <SectionHeader id="qualifications" index="02" title="Qualifications">
         <p>An MCA in progress at SIESCOMS, built on a B.Sc. in Information Technology.</p>
       </SectionHeader>
 
-      <div className="grid gap-12 lg:grid-cols-12">
-        <div className="lg:col-span-7">
-          <h3 className="label mb-6">Education</h3>
-          <ol className="relative">
-            {education.map((entry, index) => {
-              const current = Boolean(entry.status);
-              return (
-                <li key={entry.id} data-reveal style={order(index)} className="relative grid grid-cols-[1.25rem_minmax(0,1fr)] gap-x-5 pb-9 last:pb-0">
-                  {/* The rail joins entries into one sequence; it stops at the last one. */}
-                  {index < education.length - 1 ? (
-                    <span className="absolute bottom-0 left-[0.5625rem] top-6 w-px bg-line-strong" aria-hidden="true" />
-                  ) : null}
-                  <span
-                    className={`relative mt-1.5 h-[1.125rem] w-[1.125rem] rounded-full border-2 ${current ? 'border-copper bg-copper/25' : 'border-line-strong bg-void'}`}
-                    aria-hidden="true"
-                  />
-                  <div>
-                    <p className="font-mono text-xs tabular-nums text-ink-subtle">{formatRange(entry.period)}</p>
-                    <p className="mt-1.5 font-display text-xl font-medium leading-snug text-ink">{entry.degree}</p>
-                    <p className="mt-1 text-ink-muted">{entry.institution}</p>
-                    {entry.status ? (
-                      <p className="mt-3 inline-flex rounded-sm border border-copper-line bg-copper-soft px-2 py-0.5 font-mono text-xs uppercase tracking-[0.08em] text-copper">
-                        {entry.status}
-                      </p>
-                    ) : null}
-                  </div>
-                </li>
-              );
-            })}
-          </ol>
-        </div>
+      <div className="blueprint p-5 pb-9 sm:p-8 sm:pb-11 lg:p-10 lg:pb-12" data-loop>
+        <EducationTimeline rows={rows} min={min} max={max} />
+      </div>
 
-        <div className="space-y-10 lg:col-span-5">
-          <div data-reveal>
-            <h3 className="label mb-6">Training</h3>
-            <ul className="space-y-4">
-              {training.map((course) => (
-                <li key={course.id} className="panel p-6">
-                  <p className="font-mono text-xs text-ink-subtle">{course.date}</p>
-                  <p className="mt-2 font-display text-xl font-medium text-ink">{course.title}</p>
-                  <p className="mt-1 text-ink-muted">{course.provider} · {course.duration} · {course.mode}</p>
-                  {course.certificate ? <CertificateButton certificate={course.certificate} title={course.title} /> : null}
-                </li>
-              ))}
-            </ul>
+      <div className="mt-6 grid gap-6 md:grid-cols-2">
+        {training.map((course, index) => (
+          <div key={course.id} data-reveal style={order(index)}>
+          <article className="panel spot tilt-card relative h-full p-6 sm:p-8" data-tilt-card>
+            <HudDecor />
+            <h3 className="label">Training</h3>
+            <p className="relative mt-5 cursor-default font-display text-2xl font-medium tracking-tight text-ink"><ScrambleText text={course.title} /></p>
+            <dl className="mt-5 flex flex-wrap gap-x-8 gap-y-3 text-sm">
+              <div><dt className="text-ink-subtle">Provider</dt><dd className="mt-0.5 text-ink">{course.provider}</dd></div>
+              <div><dt className="text-ink-subtle">Duration</dt><dd className="mt-0.5 text-ink">{course.duration}</dd></div>
+              <div><dt className="text-ink-subtle">Mode</dt><dd className="mt-0.5 text-ink">{course.mode}</dd></div>
+              <div><dt className="text-ink-subtle">Date</dt><dd className="mt-0.5 text-ink">{course.date}</dd></div>
+            </dl>
+            {course.certificate ? <CertificateButton certificate={course.certificate} title={course.title} /> : null}
+          </article>
           </div>
-          <div data-reveal style={order(1)}>
-            <h3 className="label mb-4">Languages</h3>
-            <p className="text-ink-muted">{profile.languageProficiency}</p>
-          </div>
+        ))}
+        <div data-reveal style={order(training.length)}>
+        <article className="panel spot tilt-card relative h-full p-6 sm:p-8" data-tilt-card>
+          <HudDecor />
+          <h3 className="label">Languages</h3>
+          <ul className="relative mt-5 flex flex-wrap gap-2">
+            {profile.languages.map((language) => (
+              <li key={language} className="lang-chip group relative cursor-default overflow-hidden rounded-sm border border-line-strong px-3 py-1.5 font-display text-lg font-medium text-ink">
+                <span className="lang-name block">{language}</span>
+                {greetings[language] ? <span className="lang-hello absolute inset-0 flex items-center justify-center text-cyan" aria-hidden="true" lang={language === 'English' ? 'en' : language === 'Hindi' ? 'hi' : 'mr'}>{greetings[language]}</span> : null}
+              </li>
+            ))}
+          </ul>
+          <p className="relative mt-5 text-sm text-ink-muted">{profile.languageProficiency}</p>
+        </article>
         </div>
       </div>
     </section>

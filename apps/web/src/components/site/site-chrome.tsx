@@ -2,14 +2,15 @@
 
 import { useRef, useState } from 'react';
 import { ReactorMark } from '@/components/reactor/arc-reactor';
-import { Close, Menu } from '@/components/ui/icons';
+import { ArrowRight, Close, GitHub, Menu } from '@/components/ui/icons';
 import { sectionIds, sections } from '@/lib/sections';
 import { order } from '@/lib/style';
+import { CommandPalette, PaletteTrigger, type PaletteLinks } from './command-palette';
 import { MotionToggle, ReplayIntroButton } from './preference-controls';
 import { useActiveSection } from './use-active-section';
 
-/** Desktop rail, mobile top bar and the mobile menu dialog, sharing one active-section tracker. */
-export function SiteChrome({ name, role, footnote }: { name: string; role: string; footnote: string }) {
+/** One fixed top bar for every width: inline section links from 1024px, a full-screen menu dialog below. */
+export function SiteChrome({ name, role, footnote, links }: { name: string; role: string; footnote: string; links: PaletteLinks }) {
   const active = useActiveSection(sectionIds);
   const current = sections.find((section) => section.id === active) ?? sections[0];
   const dialog = useRef<HTMLDialogElement>(null);
@@ -28,69 +29,67 @@ export function SiteChrome({ name, role, footnote }: { name: string; role: strin
 
   return (
     <>
-      <aside className="no-print fixed inset-y-0 left-0 z-chrome hidden w-sidebar flex-col border-r border-line bg-void lg:flex" aria-label="Site">
-        <a href="#know-karna" className="mx-3 mt-6 flex items-center gap-3 rounded-sm px-3 py-2">
-          <ReactorMark size={30} />
-          <span className="min-w-0">
-            <span className="block font-display text-base font-semibold leading-tight text-ink">{name}</span>
-            <span className="mt-0.5 block text-xs leading-snug text-ink-subtle">{role}</span>
-          </span>
-        </a>
+      <header className="topbar no-print fixed inset-x-0 top-0 z-chrome">
+        <div className="shell flex h-bar items-center justify-between gap-4">
+          <a href="#know-karna" className="flex min-h-11 min-w-0 shrink-0 items-center gap-3 rounded-sm" aria-label={`${name}, back to top`}>
+            <ReactorMark size={28} />
+            <span className="min-w-0 lg:hidden xl:block">
+              <span className="block truncate font-display text-[0.9375rem] font-semibold leading-tight text-ink">{name}</span>
+              <span className="hidden truncate font-mono text-[0.6875rem] uppercase tracking-[0.08em] text-ink-subtle 2xl:block">{role}</span>
+            </span>
+          </a>
 
-        <nav aria-label="Sections" className="mt-10 px-3">
-          <ol className="space-y-0.5">
-            {sections.map((section) => {
-              const isActive = section.id === active;
-              return (
-                <li key={section.id}>
-                  <a
-                    href={`#${section.id}`}
-                    aria-current={isActive ? 'location' : undefined}
-                    className={`group relative flex min-h-11 items-center gap-3.5 rounded-sm px-3 text-[0.9375rem] transition-colors duration-fast ${
-                      isActive ? 'bg-surface-raised text-ink' : 'text-ink-muted hover:bg-surface hover:text-ink'
-                    }`}
-                  >
-                    <span className={`font-mono text-xs tabular-nums ${isActive ? 'text-cyan' : 'text-ink-subtle'}`}>{section.index}</span>
-                    {section.label}
-                    {isActive ? <span className="absolute inset-y-2.5 left-0 w-0.5 rounded-full bg-cyan" aria-hidden="true" /> : null}
-                  </a>
-                </li>
-              );
-            })}
-          </ol>
-        </nav>
+          <nav aria-label="Sections" className="hidden lg:block">
+            <ol className="flex items-center rounded-md border border-line bg-black/50 p-1 backdrop-blur-sm">
+              {sections.map((section) => {
+                const isActive = section.id === active;
+                return (
+                  <li key={section.id}>
+                    <a
+                      href={`#${section.id}`}
+                      aria-current={isActive ? 'location' : undefined}
+                      className={`nav-link flex h-9 items-center gap-2 whitespace-nowrap rounded-sm px-3 text-[0.8125rem] font-medium transition-colors duration-fast ${
+                        isActive ? 'bg-surface-overlay text-ink' : 'text-ink-muted hover:text-ink'
+                      }`}
+                    >
+                      <span className={`hidden font-mono text-[0.6875rem] tabular-nums 2xl:inline ${isActive ? 'text-cyan' : 'text-ink-subtle'}`}>{section.index}</span>
+                      {section.label}
+                    </a>
+                  </li>
+                );
+              })}
+            </ol>
+          </nav>
 
-        <div className="mt-auto space-y-5 px-6 pb-6">
-          <a href="#contact" className="btn btn-secondary w-full">Contact me</a>
-          <div className="-mx-3 flex flex-col items-start">
-            <MotionToggle />
-            <ReplayIntroButton />
+          <div className="hidden shrink-0 items-center gap-1 lg:flex">
+            <PaletteTrigger className="mr-1" />
+            {links.github ? (
+              <a href={links.github} target="_blank" rel="noopener noreferrer" className="btn-icon" title="GitHub">
+                <GitHub size={17} /><span className="sr-only">GitHub profile (opens in a new tab)</span>
+              </a>
+            ) : null}
+            <MotionToggle compact />
+            <ReplayIntroButton compact />
           </div>
-          <p className="font-mono text-xs text-ink-subtle">{footnote}</p>
-        </div>
-      </aside>
 
-      <header className="no-print sticky top-0 z-chrome flex h-bar items-center justify-between gap-3 border-b border-line bg-void/90 pl-4 pr-2 backdrop-blur-md supports-[backdrop-filter]:bg-void/75 sm:pl-6 sm:pr-4 lg:hidden">
-        <a href="#know-karna" className="flex min-h-11 min-w-0 items-center gap-2.5 rounded-sm">
-          <ReactorMark size={24} />
-          <span className="truncate font-display text-base font-semibold text-ink">{name}</span>
-        </a>
-        <div className="flex items-center gap-1">
-          <span className="hidden font-mono text-xs text-ink-subtle sm:inline" aria-hidden="true">
-            <span className="text-cyan">{current.index}</span> {current.label}
-          </span>
-          <button
-            ref={menuButton}
-            type="button"
-            className="btn btn-quiet"
-            aria-label="Open menu"
-            aria-expanded={menuOpen}
-            aria-controls="site-menu"
-            onClick={openMenu}
-          >
-            <Menu size={20} /> Menu
-          </button>
+          <div className="flex items-center gap-1 lg:hidden">
+            <span className="hidden font-mono text-xs text-ink-subtle sm:inline" aria-hidden="true">
+              <span className="text-cyan">{current.index}</span> {current.label}
+            </span>
+            <button
+              ref={menuButton}
+              type="button"
+              className="btn btn-quiet"
+              aria-label="Open menu"
+              aria-expanded={menuOpen}
+              aria-controls="site-menu"
+              onClick={openMenu}
+            >
+              <Menu size={20} /> Menu
+            </button>
+          </div>
         </div>
+        <span className="scroll-progress absolute inset-x-0 bottom-[-1px] h-px bg-gradient-to-r from-cyan/0 via-cyan to-cyan" aria-hidden="true" />
       </header>
 
       <dialog
@@ -107,7 +106,7 @@ export function SiteChrome({ name, role, footnote }: { name: string; role: strin
         <div className="flex min-h-full flex-col px-5 pb-8 sm:px-8">
           <div className="flex h-bar items-center justify-between">
             <span className="flex items-center gap-2.5">
-              <ReactorMark size={24} />
+              <ReactorMark size={26} />
               <span className="font-display text-base font-semibold">{name}</span>
             </span>
             <button type="button" className="btn btn-quiet -mr-2" aria-label="Close menu" onClick={() => closeMenu()}>
@@ -122,9 +121,9 @@ export function SiteChrome({ name, role, footnote }: { name: string; role: strin
                     href={`#${section.id}`}
                     aria-current={section.id === active ? 'location' : undefined}
                     onClick={() => closeMenu(true)}
-                    className="flex min-h-14 items-center gap-4 py-2 font-display text-2xl font-medium text-ink"
+                    className="group flex min-h-16 items-center gap-4 py-2 font-display text-[1.75rem] font-medium tracking-tight text-ink"
                   >
-                    <span className={`font-mono text-sm tabular-nums ${section.id === active ? 'text-cyan' : 'text-ink-subtle'}`}>{section.index}</span>
+                    <span className={`w-7 font-mono text-sm tabular-nums ${section.id === active ? 'text-cyan' : 'text-ink-subtle'}`}>{section.index}</span>
                     {section.label}
                   </a>
                 </li>
@@ -132,14 +131,19 @@ export function SiteChrome({ name, role, footnote }: { name: string; role: strin
             </ol>
           </nav>
           <div className="mt-8" data-menu-item style={order(sections.length)}>
-            <a href="#contact" className="btn btn-primary w-full" onClick={() => closeMenu(true)}>Contact me</a>
+            <a href="#contact" className="btn btn-primary w-full" onClick={() => closeMenu(true)}>Contact me <ArrowRight size={17} /></a>
           </div>
-          <div className="-mx-3 mt-auto flex flex-wrap pt-8" data-menu-item style={order(sections.length + 1)}>
-            <MotionToggle />
-            <ReplayIntroButton onReplay={() => closeMenu(true)} />
+          <div className="mt-auto pt-8" data-menu-item style={order(sections.length + 1)}>
+            <div className="-mx-3 flex flex-wrap">
+              <MotionToggle />
+              <ReplayIntroButton onReplay={() => closeMenu(true)} />
+            </div>
+            <p className="mt-4 font-mono text-xs text-ink-subtle">{footnote}</p>
           </div>
         </div>
       </dialog>
+
+      <CommandPalette links={links} />
     </>
   );
 }

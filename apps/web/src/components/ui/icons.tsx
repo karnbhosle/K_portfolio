@@ -39,6 +39,10 @@ export const Play = (props: IconProps) => <Icon {...props}><path d="M8 5.5v13l10
 export const Volume = (props: IconProps) => <Icon {...props}><path d="M4 9.5h3.5L12 6v12l-4.5-3.5H4v-5Z" /><path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11" /></Icon>;
 export const VolumeOff = (props: IconProps) => <Icon {...props}><path d="M4 9.5h3.5L12 6v12l-4.5-3.5H4v-5Z" /><path d="m16 9.5 5 5M21 9.5l-5 5" /></Icon>;
 export const Award = (props: IconProps) => <Icon {...props}><circle cx="12" cy="9" r="5.5" /><path d="m8.5 13.5-1.5 7 5-2.5 5 2.5-1.5-7" /></Icon>;
+export const Search = (props: IconProps) => <Icon {...props}><circle cx="11" cy="11" r="6.5" /><path d="m20 20-4.2-4.2" /></Icon>;
+export const Enter = (props: IconProps) => <Icon {...props}><path d="M20 5v7a3 3 0 0 1-3 3H5" /><path d="m9 11-4 4 4 4" /></Icon>;
+export const Hash = (props: IconProps) => <Icon {...props}><path d="M5 9h14M5 15h14M10 4 8 20M16 4l-2 16" /></Icon>;
+export const Code = (props: IconProps) => <Icon {...props}><path d="m8 7-5 5 5 5M16 7l5 5-5 5" /></Icon>;
 export const Alert = (props: IconProps) => <Icon {...props}><circle cx="12" cy="12" r="9" /><path d="M12 7.5v5.5M12 16.5h.01" /></Icon>;
 
 /** The GitHub mark (Simple Icons, CC0), filled rather than stroked. */

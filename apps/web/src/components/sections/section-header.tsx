@@ -1,18 +1,21 @@
 import type { ReactNode } from 'react';
+import { sections } from '@/lib/sections';
+import { ScrambleText } from '@/components/ui/scramble-text';
 
 /**
- * Sections are indexed 01–06 to match the navigation, an intentional editorial system
- * rather than a decorative eyebrow repeated for rhythm.
+ * Sections are indexed 01–06 to match the navigation: an index rail that draws in,
+ * an oversized title, and a short lede set to the right on wide screens.
  */
-export function SectionHeader({ index, title, id, children }: { index: string; title: string; id: string; children?: ReactNode }) {
+export function SectionHeader({ index, title, id, children }: { index: string; title: ReactNode; id: string; children?: ReactNode }) {
   return (
-    <header className="mb-10 grid gap-4 border-t border-line pt-6 sm:mb-14 md:grid-cols-[7rem_minmax(0,1fr)] md:gap-8" data-reveal>
-      <p className="font-mono text-sm text-ink-subtle" aria-hidden="true">
-        <span className="text-cyan">{index}</span> / 06
+    <header className="mb-14 sm:mb-20" data-reveal>
+      <p className="flex items-center gap-4 font-mono text-xs uppercase tracking-[0.12em] text-ink-subtle" aria-hidden="true">
+        <span><span className="text-cyan">{index}</span> / {String(sections.length).padStart(2, '0')}</span>
+        <span className="draw-x h-px flex-1 bg-gradient-to-r from-line-strong to-transparent" />
       </p>
-      <div>
-        <h2 id={`${id}-title`} className="text-heading font-semibold">{title}</h2>
-        {children ? <div className="mt-4 max-w-measure text-body-lg text-ink-muted">{children}</div> : null}
+      <div className="mt-8 grid gap-6 lg:grid-cols-12 lg:items-end lg:gap-12">
+        <h2 id={`${id}-title`} className="cursor-default text-section font-semibold lg:col-span-7">{typeof title === 'string' ? <ScrambleText text={title} /> : title}</h2>
+        {children ? <div className="max-w-measure text-body-lg text-ink-muted lg:col-span-5 lg:pb-2">{children}</div> : null}
       </div>
     </header>
   );
