@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState, type CSSProperties } from 'react';
 import { ArcReactor, ReactorMark } from '@/components/reactor/arc-reactor';
 import { Volume, VolumeOff } from '@/components/ui/icons';
+import { WarpField } from './warp-field';
 import {
   getIntroPhase, getMotion, getSound, replayIntroEvent, setIntroPhase, setSound, useIntroPhase, useSound,
 } from '@/lib/preferences';
@@ -176,6 +177,8 @@ export function IgnitionIntro({ name, tagline }: { name: string; tagline: string
         <div className="intro-space absolute inset-[-8%]" />
         <div className="intro-space-grade absolute inset-0" />
         <div className="intro-space-tint absolute inset-0" />
+        {/* On ignition the stars stretch into streaks and the view jumps to warp. */}
+        <WarpField />
       </div>
       <div className="intro-flash pointer-events-none absolute inset-0" aria-hidden="true" />
       <div className="intro-shock pointer-events-none absolute left-1/2 top-1/2 h-40 w-40 rounded-full" aria-hidden="true" />
@@ -280,7 +283,6 @@ export function IgnitionIntro({ name, tagline }: { name: string; tagline: string
 
       <div className="intro-chrome relative z-10 px-5 pb-5 text-center sm:pb-7">
         <p className="text-xs text-ink-subtle">{tagline}</p>
-        <p className="mt-1.5 font-mono text-[0.625rem] text-ink-subtle/80">Background: Hubble Ultra Deep Field · NASA, ESA, S. Beckwith (STScI) and the HUDF Team</p>
       </div>
     </div>
   );

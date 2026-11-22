@@ -1,18 +1,23 @@
 /*
  * Wireframe scenes for the hologram projector. Each scene is pure geometry: given the time,
- * a click "energy" (1 right after a click, easing to 0) and a focus index, it returns polylines
+ * and a click "energy" (1 right after a click, easing to 0), it returns polylines
  * and glowing dots in a unit-sized space. The projector rotates, projects and draws them.
  * Space: x right, y up, z away from the viewer.
  */
 
+import { coastlines } from './coastlines';
+
 export type V3 = [number, number, number];
-export type Stroke = { pts: V3[]; color: string; alpha?: number; width?: number };
-export type Dot = { p: V3; color: string; size: number; alpha?: number };
-export type Frame = { strokes: Stroke[]; dots: Dot[] };
+/** `cull` hides the parts on the far side of a sphere, so a map reads like a solid globe. */
+export type Stroke = { pts: V3[]; color: string; alpha?: number; width?: number; cull?: boolean };
+export type Dot = { p: V3; color: string; size: number; alpha?: number; cull?: boolean };
+export type Tag = { p: V3; text: string; color: string };
+export type Frame = { strokes: Stroke[]; dots: Dot[]; tags?: Tag[] };
 
 export const CYAN = '#61E8FF';
 export const BLUE = '#218CFF';
 export const COPPER = '#C98A45';
+export const GOLD = '#FFC940';
 export const WHITE = '#E8F0F7';
 
 const TAU = Math.PI * 2;
@@ -98,86 +103,6 @@ export function coreScene(t: number, energy: number): Frame {
   return { strokes, dots };
 }
 
-// --- The full-stack: interface, API and AI core as three stacked platters ------------------------
-
-export const stackLayers = [
-  { name: 'Interface', detail: 'React.js, Next.js, Tailwind CSS', color: CYAN },
-  { name: 'API', detail: 'Node.js, Express.js, FastAPI, Flask', color: WHITE },
-  { name: 'AI core', detail: 'XGBoost, LSTM, Scikit-learn', color: COPPER },
-] as const;
-
-export function stackScene(t: number, energy: number, focus: number): Frame {
-  const strokes: Stroke[] = [];
-  const dots: Dot[] = [];
-  const gap = 0.62 + energy * 0.25;
-  const half = 0.82;
-  const turn = t * 0.25;
-  const at = (x: number, y: number, z: number): V3 => spinY([x, y, z], turn);
-  const levels = stackLayers.map((layer, index) => {
-    const lift = index === focus ? 0.12 : 0;
-    return { ...layer, y: (1 - index) * gap + lift, active: index === focus };
-  });
-
-  levels.forEach((level, index) => {
-    const { y, color, active } = level;
-    const alpha = active ? 1 : 0.62;
-    const c = half * 0.12;
-    // A chamfered square platter, with a thinner underside to give it depth.
-    const outline = (k: number, dy: number): V3[] => {
-      const h = half * k;
-      const ch = c * k;
-      return [[-h + ch, -h], [h - ch, -h], [h, -h + ch], [h, h - ch], [h - ch, h], [-h + ch, h], [-h, h - ch], [-h, -h + ch], [-h + ch, -h]].map(([x, z]) => at(x!, y + dy, z!));
-    };
-    strokes.push({ pts: outline(1, 0), color, width: active ? 1.6 : 1.1, alpha });
-    strokes.push({ pts: outline(0.94, -0.06), color, width: 0.8, alpha: alpha * 0.5 });
-
-    if (index === 0) {
-      // Interface: two windows and a nav bar.
-      const rect = (x0: number, z0: number, x1: number, z1: number) => [at(x0, y, z0), at(x1, y, z0), at(x1, y, z1), at(x0, y, z1), at(x0, y, z0)];
-      strokes.push({ pts: rect(-0.6, -0.6, 0.6, -0.42), color, alpha: alpha * 0.8 });
-      strokes.push({ pts: rect(-0.6, -0.3, -0.05, 0.6), color, alpha: alpha * 0.8 });
-      strokes.push({ pts: rect(0.05, -0.3, 0.6, 0.12), color, alpha: alpha * 0.8 });
-      for (let line = 0; line < 3; line += 1) strokes.push({ pts: [at(0.05, y, 0.24 + line * 0.13), at(0.6 - line * 0.12, y, 0.24 + line * 0.13)], color, alpha: alpha * 0.6 });
-    } else if (index === 1) {
-      // API: routes as a ring of endpoints around a gateway.
-      strokes.push({ pts: circle(0.18, 24, (x, z) => at(x, y, z)), color, alpha });
-      for (let route = 0; route < 6; route += 1) {
-        const angle = (route / 6) * TAU + t * 0.4;
-        const end = at(Math.cos(angle) * 0.6, y, Math.sin(angle) * 0.6);
-        strokes.push({ pts: [at(Math.cos(angle) * 0.18, y, Math.sin(angle) * 0.18), end], color, alpha: alpha * 0.7 });
-        dots.push({ p: end, color: route % 2 ? BLUE : CYAN, size: 3, alpha });
-      }
-    } else {
-      // AI core: a small neural net, three columns of nodes, fully connected.
-      const columns = [[-0.45, [-0.4, 0, 0.4]], [0, [-0.55, -0.18, 0.18, 0.55]], [0.45, [-0.25, 0.25]]] as const;
-      for (let column = 0; column < columns.length - 1; column += 1) {
-        const [xa, as] = columns[column]!;
-        const [xb, bs] = columns[column + 1]!;
-        for (const za of as) for (const zb of bs) strokes.push({ pts: [at(xa, y, za), at(xb, y, zb)], color, alpha: alpha * 0.35, width: 0.8 });
-      }
-      columns.forEach(([x, zs], column) => zs.forEach((z, node) => {
-        const firing = (Math.sin(t * 3 + column * 1.7 + node) + 1) / 2;
-        dots.push({ p: at(x, y, z), color: firing > 0.7 ? '#FFFFFF' : COPPER, size: 2.6 + firing * 2.2, alpha });
-      }));
-    }
-  });
-
-  // Pillars at the corners, with data packets riding between the layers.
-  const corners: Array<[number, number]> = [[-half, -half], [half, -half], [half, half], [-half, half]];
-  const top = levels[0]!.y;
-  const bottom = levels[2]!.y;
-  corners.forEach(([x, z], index) => {
-    strokes.push({ pts: [at(x, top, z), at(x, bottom, z)], color: BLUE, alpha: 0.35, width: 0.8 });
-    for (let packet = 0; packet < 2; packet += 1) {
-      const phase = (t * (0.35 + index * 0.05) + packet * 0.5 + index * 0.25) % 1;
-      const goingDown = index % 2 === 0;
-      const y = goingDown ? top - (top - bottom) * phase : bottom + (top - bottom) * phase;
-      dots.push({ p: at(x, y, z), color: goingDown ? CYAN : COPPER, size: 3.2 });
-    }
-  });
-  return { strokes, dots };
-}
-
 // --- The uplink globe: Mumbai, and signals going out to the world --------------------------------
 
 const MUMBAI = { lat: 19.07, lon: 72.88 };
@@ -211,25 +136,40 @@ function arc(from: V3, to: V3, radius: number, progress: number, segments = 40):
   return pts;
 }
 
+const GLOBE_R = 0.92;
+// The continents, placed on the sphere once: they never change shape, only the view turns.
+const landOutlines: V3[][] = coastlines.map((line) => {
+  const pts: V3[] = [];
+  for (let index = 0; index < line.length; index += 2) pts.push(geo(line[index + 1]! / 10, line[index]! / 10, GLOBE_R * 1.004));
+  return pts;
+});
+
 export function globeScene(t: number, energy: number): Frame {
   const strokes: Stroke[] = [];
   const dots: Dot[] = [];
-  const R = 0.92;
+  const R = GLOBE_R;
 
+  // A faint graticule, so the far side still reads as a sphere.
   for (let lat = -60; lat <= 60; lat += 30) {
     const pts: V3[] = [];
     for (let lon = -180; lon <= 180; lon += 6) pts.push(geo(lat, lon + MUMBAI.lon, R));
-    strokes.push({ pts, color: lat === 0 ? CYAN : BLUE, alpha: lat === 0 ? 0.7 : 0.45, width: 0.9 });
+    strokes.push({ pts, color: BLUE, alpha: lat === 0 ? 0.4 : 0.22, width: 0.7 });
   }
   for (let lon = 0; lon < 360; lon += 30) {
     const pts: V3[] = [];
     for (let lat = -90; lat <= 90; lat += 6) pts.push(geo(lat, lon, R));
-    strokes.push({ pts, color: BLUE, alpha: 0.4, width: 0.9 });
+    strokes.push({ pts, color: BLUE, alpha: 0.2, width: 0.7 });
   }
+  // The world map: Natural Earth coastlines, near side only.
+  for (const pts of landOutlines) strokes.push({ pts, color: CYAN, alpha: 0.95, width: 1.15, cull: true });
 
+  // Mumbai: a gold pin standing on the coast, with its name.
   const home = geo(MUMBAI.lat, MUMBAI.lon, R);
-  dots.push({ p: home, color: COPPER, size: 6 + Math.sin(t * 4) * 1.5 + energy * 6 });
-  strokes.push({ pts: [home, scale(home, 1.18)], color: COPPER, width: 1.1 });
+  const head = scale(home, 1.2);
+  strokes.push({ pts: [home, head], color: GOLD, width: 1.6 });
+  dots.push({ p: home, color: GOLD, size: 3.2, cull: true });
+  dots.push({ p: head, color: GOLD, size: 7 + Math.sin(t * 4) * 1.2 + energy * 6 });
+  const tags: Tag[] = [{ p: head, text: 'Mumbai', color: GOLD }];
   // A ping ring spreading out from Mumbai.
   const ring = ((t * 0.6) % 1) * 0.35 + energy * 0.25;
   const [hx, hy, hz] = home;
@@ -239,7 +179,7 @@ export function globeScene(t: number, energy: number): Frame {
     const p: V3 = [hx + tangentA[0] * a + tangentB[0] * b, hy + tangentA[1] * a + tangentB[1] * b, hz + tangentA[2] * a + tangentB[2] * b];
     return scale(p, R / (Math.hypot(...p) || 1));
   });
-  strokes.push({ pts: ringPts, color: COPPER, alpha: Math.max(0, 0.9 - ring * 2.2) });
+  strokes.push({ pts: ringPts, color: GOLD, alpha: Math.max(0, 0.9 - ring * 2.2), cull: true });
 
   destinations.forEach((place, index) => {
     const cycle = 3.2;
@@ -248,9 +188,9 @@ export function globeScene(t: number, energy: number): Frame {
     const target = geo(place.lat, place.lon, R);
     const fade = local > 2.4 ? Math.max(0, 1 - (local - 2.4) / 0.8) : 1;
     const pts = arc(home, target, R, progress);
-    strokes.push({ pts, color: index % 2 ? CYAN : COPPER, alpha: 0.75 * fade, width: 0.9 });
+    strokes.push({ pts, color: index % 2 ? CYAN : WHITE, alpha: 0.6 * fade, width: 0.8 });
     dots.push({ p: pts[pts.length - 1]!, color: CYAN, size: 3, alpha: fade });
-    dots.push({ p: target, color: WHITE, size: 2.2, alpha: 0.6 });
+    dots.push({ p: target, color: WHITE, size: 2.2, alpha: 0.6, cull: true });
   });
 
   // A relay satellite on an inclined orbit.
@@ -261,8 +201,8 @@ export function globeScene(t: number, energy: number): Frame {
   dots.push({ p: sat, color: '#FFFFFF', size: 4.2 });
   const panel = (k: number): V3 => [sat[0] + k * 0.09, sat[1], sat[2]];
   strokes.push({ pts: [panel(-1.4), panel(1.4)], color: CYAN, width: 2 });
-  return { strokes, dots };
+  return { strokes, dots, tags };
 }
 
-export const scenes = { core: coreScene, stack: stackScene, globe: globeScene } as const;
+export const scenes = { core: coreScene, globe: globeScene } as const;
 export type SceneName = keyof typeof scenes;

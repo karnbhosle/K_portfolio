@@ -190,7 +190,7 @@ export function ContactForm({ email, emailHref }: { email: string; emailHref: st
       </div>
 
       <div className="mt-7 flex flex-col-reverse gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <p id={`${ids}-privacy`} className="text-caption text-ink-subtle">Your details are only used to reply to you.</p>
+        <p id={`${ids}-privacy`} className="text-caption text-ink-subtle" data-form-note>Your details are only used to reply to you.</p>
         <button type="submit" className="btn btn-primary w-full sm:w-auto" disabled={!hydrated || sending}>
           {sending ? 'Sending…' : <>Send message <ArrowRight size={17} /></>}
         </button>

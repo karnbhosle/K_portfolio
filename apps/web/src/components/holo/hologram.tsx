@@ -1,9 +1,9 @@
 'use client';
 
-import { useEffect, useRef, useState, type KeyboardEvent as ReactKeyboardEvent } from 'react';
+import { useEffect, useRef, type KeyboardEvent as ReactKeyboardEvent } from 'react';
 import { chiptune } from '@/lib/chiptune';
 import { getMotion, getSound } from '@/lib/preferences';
-import { scenes, stackLayers, type Frame, type SceneName, type V3 } from './scenes';
+import { scenes, type Frame, type SceneName, type V3 } from './scenes';
 
 const CAMERA = 3.4;
 
@@ -38,6 +38,7 @@ function draw(ctx: CanvasRenderingContext2D, w: number, h: number, frame: Frame,
     for (let index = 1; index < pts.length; index += 1) {
       const a = pts[index - 1]!;
       const b = pts[index]!;
+      if (stroke.cull && a.z > 0.02 && b.z > 0.02) continue; // behind the globe
       const depth = near((a.z + b.z) / 2);
       const alpha = base * (0.12 + 0.88 * depth);
       if (alpha < 0.02) continue;
@@ -55,6 +56,7 @@ function draw(ctx: CanvasRenderingContext2D, w: number, h: number, frame: Frame,
   }
   for (const dot of frame.dots) {
     const p = project(dot.p);
+    if (dot.cull && p.z > 0.02) continue;
     const alpha = (dot.alpha ?? 1) * (0.25 + 0.75 * near(p.z));
     const r = dot.size * p.s;
     const glow = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, r * 2.6);
@@ -71,26 +73,33 @@ function draw(ctx: CanvasRenderingContext2D, w: number, h: number, frame: Frame,
     ctx.arc(p.x, p.y, Math.max(0.8, r * 0.42), 0, Math.PI * 2);
     ctx.fill();
   }
-  ctx.globalAlpha = 1;
   ctx.globalCompositeOperation = 'source-over';
+  ctx.font = '600 10px "JetBrains Mono", ui-monospace, monospace';
+  ctx.textBaseline = 'middle';
+  for (const tag of frame.tags ?? []) {
+    const p = project(tag.p);
+    ctx.globalAlpha = 0.35 + 0.65 * near(p.z);
+    ctx.fillStyle = tag.color;
+    ctx.fillText(tag.text.toUpperCase(), p.x + 9, p.y - 1);
+  }
+  ctx.globalAlpha = 1;
 }
 
 const start: Record<SceneName, { yaw: number; pitch: number; zoom: number }> = {
   core: { yaw: 0.4, pitch: -0.32, zoom: 0.31 },
-  stack: { yaw: 0.6, pitch: -0.5, zoom: 0.4 },
-  globe: { yaw: -0.75, pitch: -0.38, zoom: 0.37 },
+  globe: { yaw: -0.35, pitch: -0.36, zoom: 0.4 },
 };
 
 /**
  * A draggable wireframe hologram. It turns on its own (unless motion is paused), follows a drag
  * with inertia, answers a click or Enter with a pulse, and idles off-screen.
  */
-export function Hologram({ scene, code, title, hint = 'Drag to rotate · click to pulse', label, className = '' }: {
+export function Hologram({ scene, code, title, hint = 'Drag to rotate · click to pulse', label, className = '', caption = true }: {
   scene: SceneName; code: string; title: string; hint?: string; label: string; className?: string;
+  /** False when the page sets the title in its own layout, outside the projector. */
+  caption?: boolean;
 }) {
   const canvas = useRef<HTMLCanvasElement>(null);
-  const [focus, setFocus] = useState(0);
-  const focusRef = useRef(0);
   const pulseRef = useRef<() => void>(() => {});
   const nudgeRef = useRef<(dyaw: number, dpitch: number) => void>(() => {});
 
@@ -129,7 +138,15 @@ export function Hologram({ scene, code, title, hint = 'Drag to rotate · click t
       if (moving) clock += dt;
       if (!drag.active) {
         // Inertia from a fling, easing back to a slow idle turn.
-        view.yaw += view.vyaw * dt + (moving ? dt * 0.12 : 0);
+        if (scene === 'globe') {
+          // The globe keeps Mumbai in view: it sways around it and drifts home after a drag.
+          view.yaw += view.vyaw * dt;
+          const home = start.globe.yaw + (moving ? Math.sin(clock * 0.3) * 0.55 : 0);
+          const off = Math.atan2(Math.sin(home - view.yaw), Math.cos(home - view.yaw));
+          view.yaw += off * Math.min(1, dt * 0.7);
+        } else {
+          view.yaw += view.vyaw * dt + (moving ? dt * 0.12 : 0);
+        }
         view.pitch += view.vpitch * dt;
         const damp = Math.exp(-dt * 2.6);
         view.vyaw *= damp;
@@ -144,7 +161,7 @@ export function Hologram({ scene, code, title, hint = 'Drag to rotate · click t
       if (busy || dirty) {
         dirty = false;
         ctx.setTransform(box.dpr, 0, 0, box.dpr, 0, 0);
-        draw(ctx, box.w, box.h, build(clock, energy, focusRef.current), view.yaw + hover.x * 0.2, view.pitch, start[scene].zoom);
+        draw(ctx, box.w, box.h, build(clock, energy), view.yaw + hover.x * 0.2, view.pitch, start[scene].zoom);
       }
       if (onScreen && !document.hidden && (busy || dirty)) schedule();
     };
@@ -156,10 +173,6 @@ export function Hologram({ scene, code, title, hint = 'Drag to rotate · click t
     pulseRef.current = () => {
       energy = 1;
       view.vyaw += 2.4;
-      if (scene === 'stack') {
-        focusRef.current = (focusRef.current + 1) % stackLayers.length;
-        setFocus(focusRef.current);
-      }
       if (getSound() === 'on') chiptune().sfx('ping');
       schedule();
     };
@@ -243,8 +256,6 @@ export function Hologram({ scene, code, title, hint = 'Drag to rotate · click t
     if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); pulseRef.current(); }
   };
 
-  const layer = scene === 'stack' ? stackLayers[focus] : null;
-
   return (
     <figure className={`holo group ${/\b(absolute|fixed)\b/.test(className) ? '' : 'relative'} ${className}`}>
       <span className="holo-base pointer-events-none absolute inset-x-[12%] bottom-[6%] h-[18%] rounded-[50%]" aria-hidden="true" />
@@ -257,18 +268,12 @@ export function Hologram({ scene, code, title, hint = 'Drag to rotate · click t
         aria-roledescription="interactive 3D hologram"
         onKeyDown={onKey}
       />
-      <figcaption className="pointer-events-none absolute inset-x-0 top-0 flex items-start justify-between gap-4 p-1 font-mono text-[0.625rem] uppercase tracking-[0.16em]">
-        <span>
+      {caption ? (
+        <figcaption className="pointer-events-none absolute inset-x-0 top-0 p-1 font-mono text-[0.625rem] uppercase tracking-[0.16em]">
           <span className="block text-cyan/80">{code}</span>
           <span className="mt-0.5 block text-ink">{title}</span>
-        </span>
-        {layer ? (
-          <span className="text-right" aria-live="polite">
-            <span className="block" style={{ color: layer.color }}>Layer {focus + 1}/3 · {layer.name}</span>
-            <span className="mt-0.5 block normal-case tracking-normal text-ink-subtle">{layer.detail}</span>
-          </span>
-        ) : null}
-      </figcaption>
+        </figcaption>
+      ) : null}
       <p className="pointer-events-none absolute bottom-0 right-0 p-1 font-mono text-[0.625rem] uppercase tracking-[0.14em] text-ink-subtle opacity-70 transition-opacity group-hover:opacity-100">{hint}</p>
     </figure>
   );

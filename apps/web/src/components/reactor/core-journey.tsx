@@ -21,6 +21,15 @@ const BURST_END = 0.82;
 const GROW_END = 0.9;
 const TRAIL = 6;
 
+/**
+ * Where the reactor rests once it has docked in the background: centred in the viewport.
+ * `ring` is the radius of its outermost drawn ring (r 190 of the 200-unit artwork).
+ */
+export function dockedCore(vw: number, vh: number) {
+  const size = Math.min(Math.min(vw, vh) * 0.92, 56 * 16) * 0.925;
+  return { x: vw / 2, y: vh / 2 + 16, size, ring: (size / 2) * 0.95 };
+}
+
 const clamp = (value: number, min = 0, max = 1) => Math.min(max, Math.max(min, value));
 const range = (p: number, start: number, end: number) => clamp((p - start) / (end - start));
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
@@ -54,7 +63,7 @@ export function CoreJourney() {
     const layout = () => {
       const vw = window.innerWidth;
       const vh = window.innerHeight;
-      backgroundSize = Math.min(Math.min(vw, vh) * 0.92, 56 * 16) * 0.925;
+      backgroundSize = dockedCore(vw, vh).size;
       backgroundOpacity = vw < 768 ? 0.12 : 0.16;
       size = Math.max(anchor.getBoundingClientRect().width, backgroundSize);
       coreEl.style.width = `${size}px`;
