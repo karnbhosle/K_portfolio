@@ -3,6 +3,6 @@
  * They are page copy rather than CV facts, so they live here and not in the shared seed.
  */
 export const taglines = {
-  hero: { lead: 'Interface, API, AI core.', punch: 'I build the whole suit.' },
-  contact: { lead: 'Hand me the hard problem.', punch: 'I’ll ship it to production.' },
+  hero: { lead: 'Some people think outside the box.', punch: 'I redesign the God-Damn BOX.' },
+  contact: { lead: 'Necessity sparks invention.', punch: 'Engineering ignites revolution.' },
 } as const;

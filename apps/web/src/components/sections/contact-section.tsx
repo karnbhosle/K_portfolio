@@ -41,7 +41,7 @@ export function ContactSection({ portfolio }: { portfolio: Portfolio }) {
             ) : null}
           </div>
           <h2 id="contact-title" className="mt-6 max-w-[16ch] text-case font-semibold">
-            <span className="sr-only">Contact: </span>{taglines.contact.lead} <span className="text-cyan">{taglines.contact.punch}</span>
+            <span className="sr-only">Contact: </span>{taglines.contact.lead} <span className="block text-cyan">{taglines.contact.punch}</span>
           </h2>
           <p className="mt-8 max-w-measure text-body-lg text-ink-muted">
             Email is the quickest way to reach me. I reply from Mumbai, on India Standard Time.

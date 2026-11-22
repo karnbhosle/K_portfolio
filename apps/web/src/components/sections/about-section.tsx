@@ -88,8 +88,8 @@ export function AboutSection({ portfolio }: { portfolio: Portfolio }) {
                 <p className="font-mono text-sm text-ink-subtle">{formatFacts(profile.educationLine)}</p>
               </div>
 
-              <p data-hero style={order(4)} className="mt-6 max-w-[32ch] font-display text-[clamp(1.375rem,1.05rem+1.2vw,2.125rem)] font-medium leading-[1.15] tracking-[-0.025em] text-ink-muted">
-                {taglines.hero.lead} <span className="text-ink">{taglines.hero.punch}</span>
+              <p data-hero style={order(4)} className="mt-6 max-w-[36ch] font-display text-[clamp(1.375rem,1.05rem+1.2vw,2.125rem)] font-medium leading-[1.15] tracking-[-0.025em] text-ink-muted">
+                {taglines.hero.lead} <span className="block text-ink">{taglines.hero.punch}</span>
               </p>
 
               <div data-hero style={order(5)} className="mt-8 flex flex-wrap items-center gap-3">

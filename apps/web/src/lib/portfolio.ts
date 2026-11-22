@@ -20,8 +20,11 @@ export const getPortfolio = cache(async (): Promise<Portfolio> => {
   }
 });
 
+/** The live site. Used for production builds on Vercel when SITE_URL is not set. */
+export const PRODUCTION_URL = 'https://karnabhosle-portfolio.vercel.app';
+
 export function siteUrl(): URL | undefined {
-  const value = process.env.SITE_URL;
+  const value = process.env.SITE_URL || (process.env.VERCEL_ENV === 'production' ? PRODUCTION_URL : '');
   if (!value) return undefined;
   try {
     const url = new URL(value);
