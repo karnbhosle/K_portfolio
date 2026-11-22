@@ -7,6 +7,8 @@ import { getMotion, useIntroPhase } from '@/lib/preferences';
  * The jump to warp, played over the deep-space photo while the reactor ignites. Stars sit almost
  * still, then stretch into streaks racing out from the centre as the core charges (3.15 s, timed
  * to the repulsor clip), and snap to full warp with a blue-white flash on the blast. Motion off: nothing.
+ * The reactor is kept clear: everything here is erased inside a soft circle around it, so the warp
+ * plays around the core and never through it.
  */
 const CHARGE_S = 3.15;
 
@@ -35,11 +37,20 @@ export function WarpField() {
     const dpr = Math.min(1.5, window.devicePixelRatio || 1);
     let w = 0;
     let h = 0;
+    // The reactor's footprint in canvas coordinates, measured outside the charge shake.
+    const clear = { x: 0, y: 0, r: 0 };
     const fit = () => {
       w = element.clientWidth;
       h = element.clientHeight;
       element.width = Math.round(w * dpr);
       element.height = Math.round(h * dpr);
+      const reactor = document.querySelector('.intro-reactor')?.getBoundingClientRect();
+      const frame = element.getBoundingClientRect();
+      if (reactor && reactor.width) {
+        clear.x = reactor.left + reactor.width / 2 - frame.left;
+        clear.y = reactor.top + reactor.height / 2 - frame.top;
+        clear.r = (reactor.width / 2) * 1.04;
+      }
     };
     fit();
     window.addEventListener('resize', fit);
@@ -116,6 +127,24 @@ export function WarpField() {
         const flash = Math.sin(Math.min(1, jump * 1.6) * Math.PI) * 0.55;
         ctx.fillStyle = `rgba(190, 225, 255, ${flash})`;
         ctx.fillRect(0, 0, w, h);
+      }
+
+      // Keep the reactor clear: cut a soft-edged hole around it through everything drawn above.
+      if (clear.r) {
+        const feather = clear.r * 0.18;
+        const hole = ctx.createRadialGradient(clear.x, clear.y, clear.r, clear.x, clear.y, clear.r + feather);
+        hole.addColorStop(0, 'rgba(0, 0, 0, 1)');
+        hole.addColorStop(1, 'rgba(0, 0, 0, 0)');
+        ctx.globalCompositeOperation = 'destination-out';
+        ctx.fillStyle = hole;
+        ctx.beginPath();
+        ctx.arc(clear.x, clear.y, clear.r + feather, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#000';
+        ctx.beginPath();
+        ctx.arc(clear.x, clear.y, clear.r, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.globalCompositeOperation = 'source-over';
       }
       raf = window.requestAnimationFrame(loop);
     };
