@@ -1049,3 +1049,13 @@ html[data-motion='on'] [data-revealed] .viz-bar { animation: viz-grow 900ms var(
 @keyframes viz-grow { from { transform: scaleX(0); } }
 html[data-motion='on'] .viz-skeleton { animation: viz-pulse 1.4s ease-in-out infinite; }
 @keyframes viz-pulse { 50% { opacity: 0.45; } }
+
+/* ------------------------------------------------------------------ */
+/* Holograms: draggable 3D wireframes projected from a glowing base     */
+/* ------------------------------------------------------------------ */
+.holo { margin: 0; }
+.holo-base { background: radial-gradient(closest-side, rgb(var(--cyan) / 0.22), rgb(var(--cyan) / 0.06) 60%, transparent); filter: blur(2px); }
+.holo-base::after { content: ''; position: absolute; inset: 30% 18%; border-radius: 50%; border: 1px solid rgb(var(--cyan) / 0.35); }
+html[data-motion='on'][data-page-visible='true'] .holo-base { animation: holo-breathe 3.6s ease-in-out infinite; }
+@keyframes holo-breathe { 50% { opacity: 0.6; transform: scaleX(0.94); } }
+.holo-canvas { background: radial-gradient(closest-side, rgb(var(--cyan) / 0.05), transparent 75%); }

@@ -1,20 +1,47 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState, type CSSProperties, type PointerEvent as ReactPointerEvent, type ReactNode } from 'react';
-import { getMotion } from '@/lib/preferences';
+import { getMotion, getSound, setSound, useSound } from '@/lib/preferences';
+import { chiptune, invadersSong, runSong, type Song } from '@/lib/chiptune';
+import { Volume, VolumeOff } from '@/components/ui/icons';
 import { bandFor, CorpusRun, pollutants, powers, POWER_SECONDS, SmogInvaders, type CanvasGame, type Direction, type Hud, type PowerKind } from './arcade-games';
 
 type Phase = 'ready' | 'playing' | 'over';
 
-/** Owns the canvas, the frame loop and the HUD state for one game class. */
-function useCanvasGame<G extends CanvasGame>(Game: new () => G) {
+// Only one game plays music at a time: whichever started last owns the soundtrack.
+let musicOwner: symbol | null = null;
+
+/** Owns the canvas, the frame loop, the HUD state and the soundtrack for one game class. */
+function useCanvasGame<G extends CanvasGame>(Game: new () => G, song: Song, tempo: (hud: Hud) => number) {
   const canvas = useRef<HTMLCanvasElement>(null);
   const game = useRef<G | null>(null);
   const size = useRef({ w: 0, h: 0, dpr: 1 });
   const frame = useRef(0);
+  const [me] = useState(() => Symbol('arcade'));
   const [phase, setPhase] = useState<Phase>('ready');
   const [hud, setHud] = useState<Hud | null>(null);
   const [result, setResult] = useState<{ hud: Hud; won: boolean } | null>(null);
+  const sound = useSound();
+
+  const startMusic = useCallback(() => {
+    if (getSound() !== 'on') return;
+    musicOwner = me;
+    chiptune().play(song);
+  }, [me, song]);
+
+  const stopMusic = useCallback(() => {
+    if (musicOwner !== me) return;
+    musicOwner = null;
+    chiptune().stop();
+  }, [me]);
+
+  // The Sound toggle can change mid-round; follow it. Leaving the page stops the music.
+  useEffect(() => {
+    if (phase !== 'playing') return;
+    if (sound === 'on' && musicOwner !== me) startMusic();
+    if (sound === 'off') stopMusic();
+  }, [sound, phase, me, startMusic, stopMusic]);
+  useEffect(() => stopMusic, [stopMusic]);
 
   const paint = useCallback((round: G, t: number) => {
     const element = canvas.current;
@@ -54,6 +81,7 @@ function useCanvasGame<G extends CanvasGame>(Game: new () => G) {
     setResult(null);
     setHud(round.hud());
     setPhase('playing');
+    startMusic();
     let last = performance.now();
     let shown = '';
     const tick = (now: number) => {
@@ -61,10 +89,25 @@ function useCanvasGame<G extends CanvasGame>(Game: new () => G) {
       last = now;
       round.step(dt, size.current.w, size.current.h);
       paint(round, now / 1000);
+      if (round.sfx.length) {
+        // A purifier pulse can clear a whole row in one frame: play each cue once.
+        if (getSound() === 'on') new Set(round.sfx).forEach((cue) => chiptune().sfx(cue));
+        round.sfx.length = 0;
+      }
       const next = round.hud();
       const key = JSON.stringify(next);
-      if (key !== shown) { shown = key; setHud(next); }
-      if (round.done) { setResult({ hud: next, won: round.won }); setPhase('over'); return; }
+      if (key !== shown) {
+        shown = key;
+        setHud(next);
+        if (musicOwner === me) chiptune().setTempo(tempo(next));
+      }
+      if (round.done) {
+        stopMusic();
+        if (getSound() === 'on') chiptune().sfx(round.won ? 'win' : 'lose');
+        setResult({ hud: next, won: round.won });
+        setPhase('over');
+        return;
+      }
       frame.current = window.requestAnimationFrame(tick);
     };
     frame.current = window.requestAnimationFrame(tick);
@@ -72,11 +115,12 @@ function useCanvasGame<G extends CanvasGame>(Game: new () => G) {
 
   const stop = () => {
     window.cancelAnimationFrame(frame.current);
+    stopMusic();
     if (game.current) setResult({ hud: game.current.hud(), won: false });
     setPhase('over');
   };
 
-  const explain = () => { window.cancelAnimationFrame(frame.current); setResult(null); setPhase('over'); };
+  const explain = () => { window.cancelAnimationFrame(frame.current); stopMusic(); setResult(null); setPhase('over'); };
 
   return { canvas, game, phase, hud, result, start, stop, explain };
 }
@@ -100,7 +144,10 @@ function ArcadeShell({ id, project, title, subtitle, accent, controls, phase, hu
           <span className="arcade-led h-1.5 w-1.5 rounded-full bg-[#ff4fd8]" aria-hidden="true" />
           {project} arcade · {title}
         </h4>
-        <div className="flex min-h-6 flex-wrap items-center gap-x-5 gap-y-1 font-mono text-[0.6875rem] uppercase tracking-[0.1em] text-ink-subtle">{hud}</div>
+        <div className="flex min-h-6 flex-wrap items-center gap-x-5 gap-y-1 font-mono text-[0.6875rem] uppercase tracking-[0.1em] text-ink-subtle">
+          {hud}
+          <MusicToggle />
+        </div>
       </div>
 
       <div className="relative z-10">
@@ -153,6 +200,23 @@ function ArcadeShell({ id, project, title, subtitle, accent, controls, phase, hu
         ) : null}
       </div>
     </section>
+  );
+}
+
+/** Chiptune soundtrack and effects on or off; shares the site-wide Sound choice. */
+function MusicToggle() {
+  const on = useSound() === 'on';
+  return (
+    <button
+      type="button"
+      className="arcade-music -my-1 inline-flex items-center gap-1.5 rounded-full border border-line px-2.5 py-1 uppercase tracking-[0.1em] text-ink-muted transition-colors hover:border-[#ff4fd8] hover:text-ink"
+      aria-pressed={on}
+      title={on ? 'Mute the chiptune soundtrack' : 'Play the chiptune soundtrack'}
+      onClick={() => setSound(on ? 'off' : 'on')}
+    >
+      {on ? <Volume size={14} /> : <VolumeOff size={14} />}
+      Music
+    </button>
   );
 }
 
@@ -237,6 +301,10 @@ function useGameKeys(active: boolean, handle: (key: string, down: boolean, repea
   }, [active, handle]);
 }
 
+// The soundtrack picks up as the round heats up: with age on the road, with each wave in the sky.
+const runTempo = (hud: Hud) => 1 + Math.max(0, Number(hud.age ?? 25) - 25) / 35 * 0.18;
+const invadersTempo = (hud: Hud) => 1 + (Number(hud.wave ?? 1) - 1) * 0.08;
+
 const directionFor: Record<string, Direction> = {
   ArrowLeft: 'left', a: 'left', A: 'left', ArrowRight: 'right', d: 'right', D: 'right',
   ArrowUp: 'up', w: 'up', W: 'up', ArrowDown: 'down', s: 'down', S: 'down',
@@ -245,7 +313,7 @@ const directionFor: Record<string, Direction> = {
 // ---------------------------------------------------------------------------------------------
 
 export function CorpusRunGame({ id, name, briefAnchor }: { id: string; name: string; briefAnchor: string }) {
-  const { canvas, game, phase, hud, result, start, stop, explain } = useCanvasGame(CorpusRun);
+  const { canvas, game, phase, hud, result, start, stop, explain } = useCanvasGame(CorpusRun, runSong, runTempo);
   const playing = phase === 'playing';
   const onKey = useCallback((key: string, down: boolean, repeat: boolean) => {
     const direction = directionFor[key];
@@ -270,7 +338,7 @@ export function CorpusRunGame({ id, name, briefAnchor }: { id: string; name: str
       title="Corpus Run"
       subtitle="Race to retirement"
       accent="copper"
-      controls="Lanes ← → · jump ↑ or Space · tap the sides, tap the middle or swipe up"
+      controls="Lanes ← → · jump ↑ or Space · tap the sides, tap the middle or swipe up · chiptune soundtrack"
       phase={phase}
       avatar={<KarnaAvatar />}
       hud={<>
@@ -326,7 +394,7 @@ export function CorpusRunGame({ id, name, briefAnchor }: { id: string; name: str
 }
 
 export function SmogInvadersGame({ id, name, briefAnchor }: { id: string; name: string; briefAnchor: string }) {
-  const { canvas, game, phase, hud, result, start, stop, explain } = useCanvasGame(SmogInvaders);
+  const { canvas, game, phase, hud, result, start, stop, explain } = useCanvasGame(SmogInvaders, invadersSong, invadersTempo);
   const playing = phase === 'playing';
   const onKey = useCallback((key: string, down: boolean) => {
     const direction = directionFor[key];
@@ -352,7 +420,7 @@ export function SmogInvadersGame({ id, name, briefAnchor }: { id: string; name: 
       title="Smog Invaders"
       subtitle="Defend the city’s air"
       accent="cyan"
-      controls="Fly: mouse, touch or arrow keys · your ship fires on its own"
+      controls="Fly: mouse, touch or arrow keys · your ship fires on its own · chiptune soundtrack"
       phase={phase}
       hud={<>
         <span>Wave <span className="tabular-nums text-ink">{hud?.wave ?? 1}/3</span></span>

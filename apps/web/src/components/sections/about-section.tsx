@@ -7,6 +7,7 @@ import { formatFacts, formatRange, joinList } from '@/lib/format';
 import { order } from '@/lib/style';
 import { LocalTime } from './local-time';
 import { HudDecor } from '@/components/ui/hud-decor';
+import { Hologram } from '@/components/holo/hologram';
 import { ScrambleText } from '@/components/ui/scramble-text';
 import { taglines } from '@/lib/copy';
 
@@ -177,6 +178,16 @@ export function AboutSection({ portfolio }: { portfolio: Portfolio }) {
                 </li>
               ))}
             </ol>
+
+            {/* Fills the column beside the profile card: the whole suit, layer by layer. */}
+            <Hologram
+              scene="stack"
+              code="Holo.01 · Full stack"
+              title="Interface · API · AI core"
+              hint="Drag to rotate · click for the next layer"
+              label="A 3D wireframe of the three layers I build: the interface on top, the API in the middle and the AI core underneath, with data moving between them."
+              className="mt-12 hidden h-[23rem] lg:block"
+            />
           </div>
 
           <aside className="lg:col-span-5" aria-labelledby="profile-readout" data-reveal style={order(1)}>

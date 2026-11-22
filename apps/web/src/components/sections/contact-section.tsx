@@ -9,6 +9,7 @@ import { LocalTime } from './local-time';
 import { taglines } from '@/lib/copy';
 import Image from 'next/image';
 import { headshot } from '@/lib/assets';
+import { Hologram } from '@/components/holo/hologram';
 
 export function ContactSection({ portfolio }: { portfolio: Portfolio }) {
   const { profile } = portfolio;
@@ -17,7 +18,15 @@ export function ContactSection({ portfolio }: { portfolio: Portfolio }) {
   return (
     <section id="contact" aria-labelledby="contact-title" className="relative pt-28 sm:pt-40">
       <div className="shell relative">
-        <header data-reveal>
+        <header className="relative" data-reveal>
+          {/* The empty side of the headline on wide screens: the arc core, in 3D. */}
+          <Hologram
+            scene="core"
+            code="Holo.02 · Arc core"
+            title="KARNA / CORE"
+            label="The KARNA CORE arc reactor as a 3D wireframe: an icosahedral core inside three orbits and a ring of coils."
+            className="absolute right-0 top-14 z-10 hidden h-[18rem] w-[18rem] xl:block 2xl:h-[21rem] 2xl:w-[21rem]"
+          />
           <p className="flex items-center gap-4 font-mono text-xs uppercase tracking-[0.12em] text-ink-subtle" aria-hidden="true">
             <span><span className="text-cyan">06</span> / {String(sections.length).padStart(2, '0')}</span>
             <span className="draw-x h-px flex-1 bg-gradient-to-r from-line-strong to-transparent" />
@@ -77,6 +86,13 @@ export function ContactSection({ portfolio }: { portfolio: Portfolio }) {
                 </Channel>
               ) : null}
             </ul>
+            <Hologram
+              scene="globe"
+              code="Holo.03 · Uplink"
+              title="Mumbai → anywhere"
+              label="A 3D wireframe globe centred on Mumbai, with signals arcing out to London, San Francisco, Singapore, Berlin, Dubai and Sydney."
+              className="mt-8 hidden h-[16rem] lg:block"
+            />
           </div>
 
           <div className="lg:col-span-8" data-reveal style={order(1)}>

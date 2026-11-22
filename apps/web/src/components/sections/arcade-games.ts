@@ -3,6 +3,8 @@
  * React: the component owns the loop and feeds in input. Scores are game points, not project data.
  * Both share one look: neon synthwave, a striped sun on the horizon, magenta and cyan glow.
  */
+import type { Sfx } from '@/lib/chiptune';
+
 export type Hud = Record<string, string | number>;
 
 export interface CanvasGame {
@@ -11,6 +13,8 @@ export interface CanvasGame {
   step(dt: number, w: number, h: number): void;
   draw(ctx: CanvasRenderingContext2D, w: number, h: number, t: number): void;
   hud(): Hud;
+  /** Sound cues raised since the last frame; the component plays and clears them. */
+  sfx: Sfx[];
 }
 
 type Spark = { x: number; y: number; vx: number; vy: number; life: number; color: string };
@@ -414,6 +418,7 @@ function drawRunner(ctx: CanvasRenderingContext2D, cx: number, ground: number, s
 export class CorpusRun implements CanvasGame {
   done = false;
   won = false;
+  sfx: Sfx[] = [];
   lane = 0;
   private x = 0;
   private age = 25;
@@ -438,7 +443,7 @@ export class CorpusRun implements CanvasGame {
 
   left() { this.lane = Math.max(-1, this.lane - 1); }
   right() { this.lane = Math.min(1, this.lane + 1); }
-  jump() { if (this.jumpT < 0 && !this.done) this.jumpT = 0; }
+  jump() { if (this.jumpT < 0 && !this.done) { this.jumpT = 0; this.sfx.push('jump'); } }
 
   private lift() { return this.jumpT < 0 ? 0 : Math.sin(Math.PI * Math.min(1, this.jumpT / JUMP_SECONDS)); }
 
@@ -514,21 +519,26 @@ export class CorpusRun implements CanvasGame {
         this.invested += 1;
         this.corpus += 10;
         burst(this.sparks, me.x, chest, NEON.gold, 8);
+        this.sfx.push('coin');
         this.floats.push({ text: '+1 invested', x: me.x, y: chest - size * 0.35, life: 0.7, color: '#FFE9A8' });
       } else if (thing.kind === 'power' && thing.power) {
         thing.gone = true;
         this.power = { kind: thing.power, left: POWER_SECONDS };
         burst(this.sparks, me.x, chest, powers[thing.power].color, 26);
+        this.sfx.push('power');
         this.floats.push({ text: `${powers[thing.power].label} · ${POWER_SECONDS}s`, x: me.x, y: chest - size * 0.4, life: 1, color: powers[thing.power].color });
       } else if (thing.kind === 'hurdle' && lift > 0.3) {
         this.jumped += 1;
+        this.sfx.push('clear');
         this.floats.push({ text: 'Cleared', x: me.x, y: chest - size * 0.35, life: 0.6, color: NEON.cyan });
       } else if (this.power?.kind === 'shield') {
         thing.gone = true;
         burst(this.sparks, me.x, chest, NEON.cyan, 22);
+        this.sfx.push('shield');
         this.floats.push({ text: 'Shield held', x: me.x, y: chest - size * 0.35, life: 0.7, color: NEON.cyan });
       } else if (this.power?.kind === 'phase') {
         this.floats.push({ text: 'Phased through', x: me.x, y: chest - size * 0.35, life: 0.7, color: NEON.magenta });
+        this.sfx.push('shield');
       } else if (this.hurt <= 0) {
         const inflation = thing.kind === 'hurdle';
         this.lives -= 1;
@@ -536,6 +546,7 @@ export class CorpusRun implements CanvasGame {
         this.flash = 0.35;
         this.hurt = 1.1;
         burst(this.sparks, me.x, chest, inflation ? NEON.red : NEON.violet, 18);
+        this.sfx.push('hit');
         this.floats.push({ text: inflation ? 'Inflation −15%' : 'Anomaly −10%', x: me.x, y: chest - size * 0.4, life: 0.9, color: '#FF8FB1' });
         if (this.lives <= 0) this.done = true;
       }
@@ -786,6 +797,7 @@ export type Direction = 'left' | 'right' | 'up' | 'down';
 export class SmogInvaders implements CanvasGame {
   done = false;
   won = false;
+  sfx: Sfx[] = [];
   private wave = 1;
   private destroyed = 0;
   private lives = 3;
@@ -863,6 +875,7 @@ export class SmogInvaders implements CanvasGame {
     this.waveKills += 1;
     const pollutant = pollutants[invader.col]!;
     burst(this.sparks, box.x, box.y, pollutant.color, 16);
+    this.sfx.push('kill');
     this.floats.push({ text: `${pollutant.name} ${label}`, x: box.x, y: box.y, life: 0.7, color: pollutant.color });
     // A power-up now and then: at most one falling at a time, and at least one a wave.
     const owed = this.waveDrops === 0 && this.waveKills >= 5;
@@ -879,6 +892,7 @@ export class SmogInvaders implements CanvasGame {
     this.flash = 0.35;
     this.hurt = 1.2;
     burst(this.sparks, this.px, this.py, '#B08DFF', 18);
+    this.sfx.push('hit');
     this.floats.push({ text, x: this.px, y: this.py - 26, life: 0.9, color: '#FF8FB1' });
     if (this.lives <= 0) this.done = true;
   }
@@ -1005,6 +1019,7 @@ export class SmogInvaders implements CanvasGame {
       this.bombs = this.bombs.filter((bomb) => bomb !== landed);
       if (this.power?.kind === 'shield') {
         burst(this.sparks, landed.x, landed.y, NEON.cyan, 10);
+        this.sfx.push('shield');
       } else {
         this.hit('Smog hit');
       }
@@ -1018,6 +1033,7 @@ export class SmogInvaders implements CanvasGame {
       this.capsules = [];
       const info = powers[caught.kind];
       burst(this.sparks, this.px, this.py, info.color, 26);
+      this.sfx.push('power');
       if (caught.kind === 'purifier') {
         this.pulse = { x: this.px, y: this.py, r: 0 };
         this.floats.push({ text: 'Purifier pulse', x: this.px, y: this.py - 32, life: 1, color: info.color });
@@ -1049,6 +1065,7 @@ export class SmogInvaders implements CanvasGame {
     if (remaining.length && lowest > line) { this.aqi = 500; this.done = true; }
     if (!remaining.length) {
       this.floats.push({ text: `Wave ${this.wave} cleared`, x: w / 2, y: h * 0.45, life: 1.1, color: NEON.cyan });
+      if (this.wave < WAVES) this.sfx.push('wave');
       this.wave += 1;
       this.bombs = [];
       if (this.wave > WAVES) { this.wave = WAVES; this.done = true; this.won = true; this.aqi = 25; }
